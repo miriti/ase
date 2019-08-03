@@ -1,0 +1,11 @@
+{
+  "name": "useless_lib",
+  "license": "MIT",
+  "tags": ["aseprite"],
+  "description": "Aseprite file format reader",
+  "version": "0.1.0",
+  "classPath": ".",
+  "releasenote": "Initial release, everything is working correctly.",
+  "contributors": ["miriti"],
+  "dependencies": {}
+}

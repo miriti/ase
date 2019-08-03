@@ -1,0 +1,13 @@
+{
+  "indentation": {
+    "character": "  ",
+    "tabWidth": 2,
+    "trailingWhitespace": false
+  },
+  "wrapping": {
+    "maxLineLength": 80,
+    "arrayWrap": {
+      "defaultWrap": "onePerLine"
+    }
+  }
+}
