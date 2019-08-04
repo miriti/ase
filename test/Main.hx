@@ -1,5 +1,6 @@
 package test;
 
+import ase.chunks.OldPaleteChunk;
 import ase.chunks.PaletteChunk;
 import ase.chunks.ColorProfileChunk;
 import ase.chunks.CelChunk;
@@ -11,7 +12,7 @@ import ase.Aseprite;
 
 class Main {
   static public function main():Void {
-    var fileData:Bytes = File.getBytes('test/006_walkman.aseprite');
+    var fileData:Bytes = File.getBytes('test/063_surprise.aseprite');
     var aseprite:Aseprite = new Aseprite(fileData);
     trace('FileSize: ${aseprite.header.fileSize}');
     trace('Magic: 0x${StringTools.hex(aseprite.header.magic, 4)}');
@@ -50,7 +51,7 @@ class Main {
           var layerChunk:LayerChunk = cast chunk;
           trace('    Name: ${layerChunk.name}');
           trace('    Flags: ${layerChunk.flags}');
-          trace('    Layer Type: ${layerChunk.header.type}');
+          trace('    Layer Type: ${layerChunk.layerType}');
           trace('    Child Level: ${layerChunk.childLevel}');
           trace('    Default Width: ${layerChunk.defaultWidth}');
           trace('    Default Height: ${layerChunk.defaultHeight}');
@@ -58,41 +59,43 @@ class Main {
           trace('    Opacity: ${layerChunk.opacity}');
         }
 
-        /*
-
-          if (chunk.header.type == ChunkType.CEL) {
-            var celChunk:CelChunk = cast chunk;
-            trace('    Layer Index: ${celChunk.layerIndex}');
-            trace('    X Position: ${celChunk.xPosition}');
-            trace('    Y Position: ${celChunk.yPosition}');
-            trace('    Opacity: ${celChunk.opacity}');
-            trace('    Cel type: ${celChunk.celType}');
-            if (celChunk.celType == CelType.RAW || celChunk.celType == CelType.COMPRESSED) {
-              trace('    Width: ${celChunk.width}');
-              trace('    Height: ${celChunk.height}');
-            } else {
-              trace('    Linked frame ${celChunk.linkedFrame}');
-            }
+        if (chunk.header.type == ChunkType.CEL) {
+          var celChunk:CelChunk = cast chunk;
+          trace('    Layer Index: ${celChunk.layerIndex}');
+          trace('    X Position: ${celChunk.xPosition}');
+          trace('    Y Position: ${celChunk.yPosition}');
+          trace('    Opacity: ${celChunk.opacity}');
+          trace('    Cel type: ${celChunk.celType}');
+          if (celChunk.celType == CelType.RAW || celChunk.celType == CelType.COMPRESSED) {
+            trace('    Width: ${celChunk.width}');
+            trace('    Height: ${celChunk.height}');
+          } else {
+            trace('    Linked frame ${celChunk.linkedFrame}');
           }
+        }
 
-          if (chunk.header.type == ChunkType.COLOR_PROFILE) {
-            var colorProfileChunk:ColorProfileChunk = cast chunk;
-            trace('    Color Profile Type: ${colorProfileChunk.colorProfileType}');
-            trace('    Flags: ${colorProfileChunk.flags}');
-            trace('    Gamma: ${colorProfileChunk.gamma}');
-          }
+        if (chunk.header.type == ChunkType.COLOR_PROFILE) {
+          var colorProfileChunk:ColorProfileChunk = cast chunk;
+          trace('    Color Profile Type: ${colorProfileChunk.colorProfileType}');
+          trace('    Flags: ${colorProfileChunk.flags}');
+          trace('    Gamma: ${colorProfileChunk.gamma}');
+        }
 
-          if (chunk.header.type == ChunkType.PALETTE) {
-            var paletteChunk:PaletteChunk = cast chunk;
-            trace('    Palette Size: ${paletteChunk.paletteSize}');
-            trace('    First Color Index: ${paletteChunk.firstColorIndex}');
-            trace('    Last Color Index: ${paletteChunk.lastColorIndex}');
-            trace('    Palette Entries: ');
-            for (num in paletteChunk.entries.keys()) {
-              trace('        [$num] ${paletteChunk.entries[num]}');
-            }
+        if (chunk.header.type == ChunkType.PALETTE) {
+          var paletteChunk:PaletteChunk = cast chunk;
+          trace('    Palette Size: ${paletteChunk.paletteSize}');
+          trace('    First Color Index: ${paletteChunk.firstColorIndex}');
+          trace('    Last Color Index: ${paletteChunk.lastColorIndex}');
+          trace('    Palette Entries: ');
+          for (num in paletteChunk.entries.keys()) {
+            trace('        [$num] ${paletteChunk.entries[num]}');
           }
-         */
+        }
+
+        if (chunk.header.type == ChunkType.OLD_PALETTE_04 || chunk.header.type == ChunkType.OLD_PALETTE_11) {
+          var oldPaletteChunk:OldPaleteChunk = cast chunk;
+          trace('    Number of packets: ${oldPaletteChunk.numPackets}');
+        }
       }
     }
   }

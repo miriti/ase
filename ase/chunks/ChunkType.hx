@@ -28,12 +28,17 @@ class ChunkType {
     USER_DATA => "USER_DATA",
     SLICE => "SLICE",
   ];
+
   public static var CLASSES:Map<Int, Class<Chunk>> = [
+    OLD_PALETTE_04 => OldPaleteChunk,
+    OLD_PALETTE_11 => OldPaleteChunk,
     LAYER => LayerChunk,
     CEL => CelChunk,
     CEL_EXTRA => CelExtraChunk,
     COLOR_PROFILE => ColorProfileChunk,
     PALETTE => PaletteChunk,
-    USER_DATA => UserDataChunk
+    USER_DATA => UserDataChunk,
+    MASK => MaskChunk,
+    FRAME_TAGS => FrameTagsChunk
   ];
 }

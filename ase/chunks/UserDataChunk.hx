@@ -21,7 +21,7 @@ class UserDataChunk extends Chunk {
     hasColor = flags == 2 || flags == 3;
 
     if (hasText) {
-      // text = bytesInput.readString(hasColor ? bytesInput.length - 4 : bytesInput.length);
+      text = bytesInput.readString((hasColor ? bytesInput.length - 4 : bytesInput.length) - 4);
     }
 
     if (hasColor) {

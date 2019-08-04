@@ -20,10 +20,10 @@ class LayerChunk extends Chunk {
     layerType = bytesInput.readInt16();
     childLevel = bytesInput.readInt16();
     defaultWidth = bytesInput.readInt16();
-    defaultWidth = bytesInput.readInt16();
+    defaultHeight = bytesInput.readInt16();
     blendMode = bytesInput.readInt16();
     opacity = bytesInput.readByte();
     reserved = bytesInput.read(3);
-    // name = bytesInput.readUntil(0);
+    name = bytesInput.readString(bytesInput.readUInt16());
   }
 }

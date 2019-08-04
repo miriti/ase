@@ -18,14 +18,14 @@ class PaletteEntry {
 
     flags = bytesInput.readUInt16();
 
-    if (flags == 1) {
-      throw 'Named colors are unsupported yet';
-    }
-
     red = bytesInput.readByte();
     green = bytesInput.readByte();
     blue = bytesInput.readByte();
     alpha = bytesInput.readByte();
+
+    if (flags == 1) {
+      name = bytesInput.readString(bytesInput.readUInt16());
+    }
   }
 
   public function toString() {

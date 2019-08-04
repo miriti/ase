@@ -19,7 +19,24 @@ class Frame {
 
     var lastChunk:Chunk = null;
 
+    var start:Int = 0;
+
     for (numChunk in 0...header.numChunks) {
+      /*
+        var size:Int = frameData.getInt32(start);
+        var chunkData:Bytes = frameData.sub(start, size);
+        var type:Int = chunkData.getUInt16(4);
+        trace(StringTools.hex(type, 4));
+
+        if (type == 0x2004) {
+          for (i in 0...chunkData.length) {
+            Sys.print('${StringTools.hex(chunkData.get(i), 2)} ');
+          }
+          Sys.print('\n');
+        }
+        start += size;
+       */
+
       var chunkHeader:ChunkHeader = new ChunkHeader(bytesInput.read(ChunkHeader.BYTE_SIZE));
       var chunkBytes:Bytes = bytesInput.read(chunkHeader.size - ChunkHeader.BYTE_SIZE);
 
