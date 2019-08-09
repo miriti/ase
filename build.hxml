@@ -1,0 +1,3 @@
+-main ase.Aseprite
+-lib munit
+-cp src

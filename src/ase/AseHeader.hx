@@ -4,6 +4,8 @@ import haxe.Int32;
 import haxe.io.Bytes;
 
 class AseHeader {
+  public static inline var ASEPRITE_MAGIC:Int = 0xA5E0;
+
   public var fileSize:Int32;
   public var magic:Int;
   public var frames:Int;

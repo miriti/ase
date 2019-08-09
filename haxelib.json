@@ -4,7 +4,7 @@
   "tags": ["aseprite"],
   "description": "Aseprite file format reader",
   "version": "0.1.0",
-  "classPath": ".",
+  "classPath": "src",
   "releasenote": "Initial release, everything is working correctly.",
   "contributors": ["miriti"],
   "dependencies": {}

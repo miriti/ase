@@ -7,6 +7,8 @@ class Aseprite {
   public var header:AseHeader;
   public var frames:Array<Frame> = [];
 
+  public static function main() {}
+
   public function new(data:Bytes) {
     var bytesInput:BytesInput = new BytesInput(data);
 
