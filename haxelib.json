@@ -1,7 +1,8 @@
 {
-  "name": "useless_lib",
+  "name": "ase",
+  "url": "https://github.com/miriti/ase",
   "license": "MIT",
-  "tags": ["aseprite"],
+  "tags": ["aseprite", "ase", "format"],
   "description": "Aseprite file format loader",
   "version": "0.9.0",
   "classPath": "src",
