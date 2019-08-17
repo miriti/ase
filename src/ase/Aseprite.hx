@@ -3,6 +3,7 @@ package ase;
 import haxe.io.BytesInput;
 import haxe.io.Bytes;
 
+@:expose('Aseprite')
 class Aseprite {
   public var header:AseHeader;
   public var frames:Array<Frame> = [];

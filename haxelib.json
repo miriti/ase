@@ -2,10 +2,10 @@
   "name": "useless_lib",
   "license": "MIT",
   "tags": ["aseprite"],
-  "description": "Aseprite file format reader",
-  "version": "0.1.0",
+  "description": "Aseprite file format loader",
+  "version": "0.9.0",
   "classPath": "src",
-  "releasenote": "Initial release, everything is working correctly.",
+  "releasenote": "Initial release",
   "contributors": ["miriti"],
   "dependencies": {}
 }

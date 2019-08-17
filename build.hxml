@@ -1,3 +1,5 @@
 -main ase.Aseprite
--lib munit
 -cp src
+-D js-es=6
+-D shallow-expose
+-js build/js/ase.js
