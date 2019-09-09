@@ -8,17 +8,24 @@ class Aseprite {
   public var header:AseHeader;
   public var frames:Array<Frame> = [];
 
-  public static function main() {}
+  public static function fromBytes(bytes:Bytes):Aseprite {
+    return fromBytesInput(new BytesInput(bytes));
+  }
 
-  public function new(data:Bytes) {
-    var bytesInput:BytesInput = new BytesInput(data);
+  public static function fromBytesInput(bytesInput:BytesInput):Aseprite {
+    var aseprite:Aseprite = new Aseprite();
 
-    header = new AseHeader(bytesInput.read(128));
-
-    for (frameNum in 0...header.frames) {
+    aseprite.header = new AseHeader(bytesInput.read(128));
+    for (frameNum in 0...aseprite.header.frames) {
       var frameHeader:FrameHeader = new FrameHeader(bytesInput.read(FrameHeader.BYTE_SIZE));
       var frame:Frame = new Frame(frameHeader, bytesInput.read(frameHeader.size - FrameHeader.BYTE_SIZE));
-      frames.push(frame);
+      aseprite.frames.push(frame);
     }
+
+    return aseprite;
   }
+
+  public static function main() {}
+
+  public function new() {}
 }
