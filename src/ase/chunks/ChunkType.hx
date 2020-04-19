@@ -9,7 +9,7 @@ class ChunkType {
   public static inline var COLOR_PROFILE:Int = 0x2007;
   public static inline var MASK:Int = 0x2016;
   public static inline var PATH:Int = 0x2017;
-  public static inline var FRAME_TAGS:Int = 0x2018;
+  public static inline var TAGS:Int = 0x2018;
   public static inline var PALETTE:Int = 0x2019;
   public static inline var USER_DATA:Int = 0x2020;
   public static inline var SLICE:Int = 0x2022;
@@ -23,7 +23,7 @@ class ChunkType {
     COLOR_PROFILE => "COLOR_PROFILE",
     MASK => "MASK",
     PATH => "PATH",
-    FRAME_TAGS => "FRAME_TAGS",
+    TAGS => "TAGS",
     PALETTE => "PALETTE",
     USER_DATA => "USER_DATA",
     SLICE => "SLICE",
@@ -39,6 +39,6 @@ class ChunkType {
     PALETTE => PaletteChunk,
     USER_DATA => UserDataChunk,
     MASK => MaskChunk,
-    FRAME_TAGS => FrameTagsChunk
+    TAGS => TagsChunk
   ];
 }

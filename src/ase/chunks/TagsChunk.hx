@@ -2,7 +2,7 @@ package ase.chunks;
 
 import haxe.io.Bytes;
 
-typedef FrameTag = {
+typedef Tag = {
   fromFrame:Int,
   toFrame:Int,
   animDirection:Int,
@@ -12,10 +12,10 @@ typedef FrameTag = {
   tagName:String
 };
 
-class FrameTagsChunk extends Chunk {
+class TagsChunk extends Chunk {
   public var numTags:Int;
   public var reserved:Bytes;
-  public var tags:Array<FrameTag> = [];
+  public var tags:Array<Tag> = [];
 
   public function new(header:ChunkHeader, chunkData:Bytes) {
     super(header, chunkData);
@@ -24,7 +24,7 @@ class FrameTagsChunk extends Chunk {
     reserved = bytesInput.read(8);
 
     for (tagIndex in 0...numTags) {
-      var newFrameTag:FrameTag = {
+      var newFrameTag:Tag = {
         fromFrame: bytesInput.readUInt16(),
         toFrame: bytesInput.readUInt16(),
         animDirection: bytesInput.readByte(),

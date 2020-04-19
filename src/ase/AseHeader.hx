@@ -1,5 +1,6 @@
 package ase;
 
+import haxe.io.BytesInput;
 import haxe.Int32;
 import haxe.io.Bytes;
 
@@ -18,29 +19,39 @@ class AseHeader {
   public var colorsNumber:Int;
   public var pixelWidth:Int;
   public var pixelHeight:Int;
+  public var gridX:Int;
+  public var gridY:Int;
+  public var gridWidth:Int;
+  public var gridHeight:Int;
   public var reserved:Bytes;
 
   public function new(headerData:Bytes) {
-    fileSize = headerData.getInt32(0);
-    magic = headerData.getUInt16(4);
+    var bytesInput = new BytesInput(headerData);
+    fileSize = bytesInput.readInt32();
+    magic = bytesInput.readUInt16();
     if (magic != 0xA5E0) {
       throw 'Invalid magic number (should be 0xA5E0)';
     }
-    frames = headerData.getUInt16(6);
-    width = headerData.getUInt16(8);
-    height = headerData.getUInt16(10);
-    colorDepth = headerData.getUInt16(12);
-    flags = headerData.getInt32(14);
-    speed = headerData.getUInt16(18);
+    frames = bytesInput.readUInt16();
+    width = bytesInput.readUInt16();
+    height = bytesInput.readUInt16();
+    colorDepth = bytesInput.readUInt16();
+    flags = bytesInput.readInt32();
+    speed = bytesInput.readUInt16();
 
-    if (headerData.getInt32(20) != 0 || headerData.getInt32(24) != 0) {
+    if (bytesInput.readInt32() != 0 || bytesInput.readInt32() != 0) {
       throw 'DWORDs at 20 and 24 should be zero';
     }
 
-    paletteEntry = headerData.get(28);
-    colorsNumber = headerData.getUInt16(31);
-    pixelWidth = headerData.get(33);
-    pixelHeight = headerData.get(34);
-    reserved = headerData.sub(35, 92);
+    paletteEntry = bytesInput.readByte();
+    bytesInput.read(3); // ignore
+    colorsNumber = bytesInput.readUInt16();
+    pixelWidth = bytesInput.readByte();
+    pixelHeight = bytesInput.readByte();
+    gridX = bytesInput.readByte();
+    gridY = bytesInput.readByte();
+    gridWidth = bytesInput.readUInt16();
+    gridHeight = bytesInput.readUInt16();
+    reserved = bytesInput.read(84);
   }
 }
