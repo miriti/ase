@@ -15,30 +15,31 @@ class ChunkType {
   public static inline var SLICE:Int = 0x2022;
 
   public static var NAMES:Map<Int, String> = [
-    OLD_PALETTE_04 => "OLD_PALETTE_04",
-    OLD_PALETTE_11 => "OLD_PALETTE_11",
-    LAYER => "LAYER",
     CEL => "CEL",
     CEL_EXTRA => "CEL_EXTRA",
     COLOR_PROFILE => "COLOR_PROFILE",
+    LAYER => "LAYER",
     MASK => "MASK",
-    PATH => "PATH",
-    TAGS => "TAGS",
+    OLD_PALETTE_04 => "OLD_PALETTE_04",
+    OLD_PALETTE_11 => "OLD_PALETTE_11",
     PALETTE => "PALETTE",
-    USER_DATA => "USER_DATA",
+    PATH => "PATH",
     SLICE => "SLICE",
+    TAGS => "TAGS",
+    USER_DATA => "USER_DATA"
   ];
 
   public static var CLASSES:Map<Int, Class<Chunk>> = [
-    OLD_PALETTE_04 => OldPaleteChunk,
-    OLD_PALETTE_11 => OldPaleteChunk,
-    LAYER => LayerChunk,
     CEL => CelChunk,
     CEL_EXTRA => CelExtraChunk,
     COLOR_PROFILE => ColorProfileChunk,
-    PALETTE => PaletteChunk,
-    USER_DATA => UserDataChunk,
+    LAYER => LayerChunk,
     MASK => MaskChunk,
-    TAGS => TagsChunk
+    OLD_PALETTE_04 => OldPaleteChunk,
+    OLD_PALETTE_11 => OldPaleteChunk,
+    PALETTE => PaletteChunk,
+    SLICE => SliceChunk,
+    TAGS => TagsChunk,
+    USER_DATA => UserDataChunk,
   ];
 }

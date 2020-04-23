@@ -3,9 +3,10 @@
 -main TestMain
 -lib munit
 -lib hamcrest
--cp src
 -cp test
+-cp src
 --resource test_files/128x128_rgba.aseprite@128x128_rgba
+--resource test_files/slices.aseprite@slices.aseprite
 -neko bin/neko_test.n
 
 ## JavaScript NodeJS
@@ -14,7 +15,8 @@
 -lib munit
 -lib hamcrest
 -lib hxnodejs
--cp src
 -cp test
+-cp src
 --resource test_files/128x128_rgba.aseprite@128x128_rgba
+--resource test_files/slices.aseprite@slices.aseprite
 -js bin/js_test.js

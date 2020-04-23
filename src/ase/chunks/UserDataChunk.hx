@@ -17,13 +17,11 @@ class UserDataChunk extends Chunk {
 
     flags = bytesInput.readInt32();
 
-    hasText = flags == 1 || flags == 3;
-    hasColor = flags == 2 || flags == 3;
+    hasText = flags & (1 << 0) != 0;
+    hasColor = flags & (1 << 1) != 0;
 
     if (hasText) {
-      text = bytesInput.readString((hasColor ? bytesInput.length
-        - 4 : bytesInput.length)
-        - 4);
+      text = bytesInput.readString(bytesInput.readUInt16());
     }
 
     if (hasColor) {

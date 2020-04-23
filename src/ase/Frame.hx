@@ -11,6 +11,7 @@ import ase.chunks.ChunkHeader;
 class Frame {
   public var header:FrameHeader;
   public var chunks:Array<Chunk> = [];
+  public var chunkTypes:Map<Int, Array<Chunk>> = [];
 
   public function new(header:FrameHeader, frameData:Bytes) {
     var bytesInput:BytesInput = new BytesInput(frameData);
@@ -23,7 +24,8 @@ class Frame {
       var chunkHeader:ChunkHeader = new ChunkHeader(bytesInput.read(ChunkHeader.BYTE_SIZE));
 
       try {
-        var chunkBytes:Bytes = bytesInput.read(chunkHeader.size - ChunkHeader.BYTE_SIZE);
+        var chunkBytes:Bytes = bytesInput.read(chunkHeader.size
+          - ChunkHeader.BYTE_SIZE);
         var chunk:Chunk = Chunk.factory(chunkHeader, chunkBytes);
 
         if (lastChunk != null) {
@@ -37,6 +39,17 @@ class Frame {
         }
 
         chunks.push(chunk);
+        if (!chunkTypes.exists(chunk.header.type))
+          chunkTypes[
+            chunk.header.type
+          ] = [
+            chunk
+          ];
+        else
+          chunkTypes[
+            chunk.header.type
+          ].push(chunk);
+
         lastChunk = chunk;
       } catch (error:String) {
         trace('Error: ${error}');

@@ -1,6 +1,5 @@
 package ase.chunks;
 
-import haxe.Int32;
 import haxe.io.Bytes;
 
 class ColorProfileChunk extends Chunk {

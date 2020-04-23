@@ -23,7 +23,7 @@ class PaletteEntry {
     blue = bytesInput.readByte();
     alpha = bytesInput.readByte();
 
-    if (flags == 1) {
+    if (flags & (1 << 0) != 0) {
       name = bytesInput.readString(bytesInput.readUInt16());
     }
   }
