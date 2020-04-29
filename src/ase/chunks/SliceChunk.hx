@@ -22,11 +22,11 @@ class SliceKey {
 class SliceChunk extends Chunk {
   public var numSliceKeys:Int32;
   public var flags:Int32;
-
   public var reserved:Int32;
   public var name:String;
-
   public var sliceKeys:Array<SliceKey> = [];
+  public var has9Slices:Bool;
+  public var hasPivot:Bool;
 
   public function new(header:ChunkHeader, chunkData:Bytes) {
     super(header, chunkData);
@@ -45,6 +45,7 @@ class SliceChunk extends Chunk {
       sliceKey.height = bytesInput.readInt32();
 
       if (flags & (1 << 0) != 0) {
+        has9Slices = true;
         sliceKey.xCenter = bytesInput.readInt32();
         sliceKey.yCenter = bytesInput.readInt32();
         sliceKey.centerWidth = bytesInput.readInt32();
@@ -52,6 +53,7 @@ class SliceChunk extends Chunk {
       }
 
       if (flags & (1 << 1) != 0) {
+        hasPivot = true;
         sliceKey.xPivot = bytesInput.readInt32();
         sliceKey.yPivot = bytesInput.readInt32();
       }
