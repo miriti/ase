@@ -25,28 +25,24 @@ haxelib install ase
 
 ```haxe
 import sys.io.File;
-import ase.Aseprite;
+import ase.Ase;
 
 var data:Bytes = File.getBytes("path/to/file.aseprite");
-var aseprite:Aseprite = new Aseprite(data);
+var ase:Ase = new Ase(data);
 ```
 
 Now you can access the Aseprite file header:
 
 ```haxe
-trace(aseprite.header.width);
-trace(aseprite.header.height);
+trace(ase.header.width);
+trace(ase.header.height);
 ```
 
 and frames data:
 
 ```haxe
-trace(aseprite.frames);
+trace(ase.frames);
 ```
-
-## TODO
-
-- [ ] Creating/changing and saving files in Aseprite format
 
 ## Authors
 

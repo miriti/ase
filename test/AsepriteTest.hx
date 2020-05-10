@@ -1,5 +1,5 @@
 import ase.AseHeader;
-import ase.Aseprite;
+import ase.Ase;
 import ase.chunks.ChunkType;
 import haxe.Resource;
 import haxe.io.Bytes;
@@ -9,7 +9,7 @@ class AsepriteTest {
   @Test
   public function case128x128_rgba() {
     // TODO: More/better tests
-    var aseprite = Aseprite.fromBytes(Resource.getBytes('128x128_rgba'));
+    var aseprite = Ase.fromBytes(Resource.getBytes('128x128_rgba'));
     Assert.areEqual(AseHeader.ASEPRITE_MAGIC, aseprite.header.magic);
     Assert.areEqual(128, aseprite.header.width);
     Assert.areEqual(128, aseprite.header.height);
@@ -20,7 +20,7 @@ class AsepriteTest {
   @Test
   public function caseSlices() {
     // TODO: More/better tests
-    var aseprite = Aseprite.fromBytes(Resource.getBytes('slices.aseprite'));
+    var aseprite = Ase.fromBytes(Resource.getBytes('slices.aseprite'));
     Assert.areEqual(aseprite.frames[
       0
     ].chunkTypes[

@@ -1,4 +1,4 @@
--main ase.Aseprite
+-main ase.Ase
 -cp src
 -D js-es=6
 -D shallow-expose

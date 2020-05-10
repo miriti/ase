@@ -4,9 +4,9 @@
   "license": "MIT",
   "tags": ["aseprite", "ase", "format"],
   "description": "Aseprite file format parser",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "classPath": "src",
-  "releasenote": "All Chunks are being parsed so it's v1.0.0",
+  "releasenote": "Aseprite class renamed to Ase",
   "contributors": ["miriti"],
   "dependencies": {}
 }
