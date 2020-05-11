@@ -16,7 +16,7 @@ class Ase {
     var aseprite:Ase = new Ase();
 
     aseprite.header = new AseHeader(bytesInput.read(128));
-    for (frameNum in 0...aseprite.header.frames) {
+    for (_ in 0...aseprite.header.frames) {
       var frameHeader:FrameHeader = new FrameHeader(bytesInput.read(FrameHeader.BYTE_SIZE));
       var frame:Frame = new Frame(frameHeader,
         bytesInput.read(frameHeader.size - FrameHeader.BYTE_SIZE));
