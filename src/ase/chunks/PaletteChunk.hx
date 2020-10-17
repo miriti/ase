@@ -50,7 +50,7 @@ class PaletteChunk extends Chunk {
 
     var entryStart:Int = 20;
 
-    for (entryNum in firstColorIndex...lastColorIndex) {
+    for (entryNum in firstColorIndex...lastColorIndex + 1) {
       var entry:PaletteEntry = new PaletteEntry(bytesInput.read(PaletteEntry.SIZE));
       entries.set(entryNum, entry);
       entryStart += PaletteEntry.SIZE;
