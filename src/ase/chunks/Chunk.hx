@@ -1,32 +1,62 @@
 package ase.chunks;
 
-import haxe.io.BytesInput;
+import ase.types.ChunkType;
 import haxe.io.Bytes;
+import haxe.io.BytesInput;
 
 class Chunk {
   public var header:ChunkHeader;
   public var userData:UserDataChunk;
 
-  private var bytesInput:BytesInput;
+  public var size(get, never):Int;
 
-  public function new(header:ChunkHeader, chunkData:Bytes) {
-    bytesInput = new BytesInput(chunkData);
-    this.header = header;
+  function get_size():Int {
+    return header.size;
   }
 
-  public static function factory(header:ChunkHeader, chunkData:Bytes):Chunk {
-    var chunkClass:Class<Chunk> = ChunkType.CLASSES[
-      header.type
-    ];
+  public static function fromBytes(bytes:Bytes):Chunk {
+    var bi = new BytesInput(bytes);
 
-    if (chunkClass != null) {
-      return Type.createInstance(chunkClass, [
-        header,
-        chunkData
-      ]);
+    var header:ChunkHeader = ChunkHeader.fromBytes(bi.read(ChunkHeader.BYTE_SIZE));
+    var chunkBytes:Bytes = bi.read(header.size - ChunkHeader.BYTE_SIZE);
+
+    var chunk:Chunk = switch (cast(header.type, ChunkType)) {
+      case CEL:
+        CelChunk.fromBytes(chunkBytes);
+      case CEL_EXTRA:
+        CelExtraChunk.fromBytes(chunkBytes);
+      case COLOR_PROFILE:
+        ColorProfileChunk.fromBytes(chunkBytes);
+      case LAYER:
+        LayerChunk.fromBytes(chunkBytes);
+      case MASK:
+        MaskChunk.fromBytes(chunkBytes);
+      case OLD_PALETTE_04 | OLD_PALETTE_11:
+        OldPaleteChunk.fromBytes(chunkBytes);
+      case PALETTE:
+        PaletteChunk.fromBytes(chunkBytes);
+      case SLICE:
+        SliceChunk.fromBytes(chunkBytes);
+      case TAGS:
+        TagsChunk.fromBytes(chunkBytes);
+      case USER_DATA:
+        UserDataChunk.fromBytes(chunkBytes);
+      case _:
+        null;
     }
 
-    trace('Unsupported chunk: 0x${StringTools.hex(header.type, 4)}');
-    return new Chunk(header, chunkData);
+    chunk.header = header;
+
+    return chunk;
+  }
+
+  public function toBytes():Bytes {
+    throw 'Not implemented';
+  }
+
+  private function new(?createHeader:Bool = false, ?type:ChunkType) {
+    if (createHeader) {
+      header = new ChunkHeader(type);
+    }
   }
 }

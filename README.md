@@ -24,12 +24,14 @@ haxelib install ase
 
 ### Usage
 
+#### Parsing a file
+
 ```haxe
 import sys.io.File;
 import ase.Ase;
 
 var data:Bytes = File.getBytes("path/to/file.aseprite");
-var ase:Ase = new Ase(data);
+var ase:Ase = Ase.fromBytes(data);
 ```
 
 Now you can access the Aseprite file header:

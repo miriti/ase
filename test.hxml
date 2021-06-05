@@ -1,22 +1,5 @@
-## Neko
---next
--main TestMain
--lib munit
--lib hamcrest
 -cp test
 -cp src
---resource test_files/128x128_rgba.aseprite@128x128_rgba
---resource test_files/slices.aseprite@slices.aseprite
--neko bin/neko_test.n
-
-## JavaScript NodeJS
---next
--main TestMain
--lib munit
--lib hamcrest
--lib hxnodejs
--cp test
--cp src
---resource test_files/128x128_rgba.aseprite@128x128_rgba
---resource test_files/slices.aseprite@slices.aseprite
--js bin/js_test.js
+--main TestMain
+--hl test/test.hl
+--cmd hl test/test.hl

@@ -1,6 +1,7 @@
 package ase.chunks;
 
 import haxe.io.Bytes;
+import haxe.io.BytesInput;
 
 typedef Tag = {
   fromFrame:Int,
@@ -17,24 +18,32 @@ class TagsChunk extends Chunk {
   public var reserved:Bytes;
   public var tags:Array<Tag> = [];
 
-  public function new(header:ChunkHeader, chunkData:Bytes) {
-    super(header, chunkData);
+  public static function fromBytes(bytes:Bytes):TagsChunk {
+    var chunk = new TagsChunk();
 
-    numTags = bytesInput.readUInt16();
-    reserved = bytesInput.read(8);
+    var bi = new BytesInput(bytes);
 
-    for (tagIndex in 0...numTags) {
+    chunk.numTags = bi.readUInt16();
+    chunk.reserved = bi.read(8);
+
+    for (_ in 0...chunk.numTags) {
       var newFrameTag:Tag = {
-        fromFrame: bytesInput.readUInt16(),
-        toFrame: bytesInput.readUInt16(),
-        animDirection: bytesInput.readByte(),
-        reserved: bytesInput.read(8),
-        tagColor: bytesInput.readInt24(),
-        extraByte: bytesInput.readByte(),
-        tagName: bytesInput.readString(bytesInput.readUInt16())
+        fromFrame: bi.readUInt16(),
+        toFrame: bi.readUInt16(),
+        animDirection: bi.readByte(),
+        reserved: bi.read(8),
+        tagColor: bi.readInt24(),
+        extraByte: bi.readByte(),
+        tagName: bi.readString(bi.readUInt16())
       };
 
-      tags.push(newFrameTag);
+      chunk.tags.push(newFrameTag);
     }
+
+    return chunk;
+  }
+
+  private function new(?createHeader:Bool = false) {
+    super(createHeader, TAGS);
   }
 }

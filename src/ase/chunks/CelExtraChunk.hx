@@ -1,6 +1,7 @@
 package ase.chunks;
 
 import haxe.io.Bytes;
+import haxe.io.BytesInput;
 
 class CelExtraChunk extends Chunk {
   public var flags:Int;
@@ -10,14 +11,21 @@ class CelExtraChunk extends Chunk {
   public var heightInSprite:Float;
   public var reserved:Bytes;
 
-  public function new(header:ChunkHeader, chunkData:Bytes) {
-    super(header, chunkData);
+  public static function fromBytes(bytes:Bytes):CelExtraChunk {
+    var chunk = new CelExtraChunk();
+    var bi = new BytesInput(bytes);
 
-    flags = bytesInput.readUInt16();
-    preciseXPosition = bytesInput.readFloat();
-    preciseYPosition = bytesInput.readFloat();
-    widthInSprite = bytesInput.readFloat();
-    heightInSprite = bytesInput.readFloat();
-    reserved = bytesInput.read(16);
+    chunk.flags = bi.readUInt16();
+    chunk.preciseXPosition = bi.readFloat();
+    chunk.preciseYPosition = bi.readFloat();
+    chunk.widthInSprite = bi.readFloat();
+    chunk.heightInSprite = bi.readFloat();
+    chunk.reserved = bi.read(16);
+
+    return chunk;
+  }
+
+  private function new(?createHeader:Bool = false) {
+    super(createHeader, CEL_EXTRA);
   }
 }

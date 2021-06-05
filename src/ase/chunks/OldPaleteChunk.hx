@@ -1,6 +1,7 @@
 package ase.chunks;
 
 import haxe.io.Bytes;
+import haxe.io.BytesInput;
 
 typedef Packet = {
   skipEntries:Int,
@@ -12,27 +13,34 @@ class OldPaleteChunk extends Chunk {
   public var numPackets:Int;
   public var packets:Array<Packet> = [];
 
-  public function new(header:ChunkHeader, chunkData:Bytes) {
-    super(header, chunkData);
+  public static function fromBytes(bytes:Bytes):OldPaleteChunk {
+    var chunk = new OldPaleteChunk();
+    var bi = new BytesInput(bytes);
 
-    numPackets = bytesInput.readUInt16();
+    chunk.numPackets = bi.readUInt16();
 
-    for (packetIndex in 0...numPackets) {
+    for (_ in 0...chunk.numPackets) {
       var newPacket:Packet = {
-        skipEntries: bytesInput.readByte(),
-        numColors: bytesInput.readByte(),
+        skipEntries: bi.readByte(),
+        numColors: bi.readByte(),
         colors: []
       };
 
-      for (colorIndex in 0...newPacket.numColors) {
+      for (_ in 0...newPacket.numColors) {
         newPacket.colors.push({
-          red: bytesInput.readByte(),
-          green: bytesInput.readByte(),
-          blue: bytesInput.readByte()
+          red: bi.readByte(),
+          green: bi.readByte(),
+          blue: bi.readByte()
         });
       }
 
-      packets.push(newPacket);
+      chunk.packets.push(newPacket);
     }
+
+    return chunk;
+  }
+
+  private function new(?createHeader:Bool = false) {
+    super(createHeader, OLD_PALETTE_04);
   }
 }

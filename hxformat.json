@@ -5,9 +5,6 @@
     "trailingWhitespace": false
   },
   "wrapping": {
-    "maxLineLength": 80,
-    "arrayWrap": {
-      "defaultWrap": "onePerLine"
-    }
+    "maxLineLength": 80
   }
 }

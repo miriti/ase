@@ -2,6 +2,7 @@ package ase.chunks;
 
 import haxe.Int32;
 import haxe.io.Bytes;
+import haxe.io.BytesInput;
 
 class SliceKey {
   public var frameNumber:Int;
@@ -28,37 +29,44 @@ class SliceChunk extends Chunk {
   public var has9Slices:Bool;
   public var hasPivot:Bool;
 
-  public function new(header:ChunkHeader, chunkData:Bytes) {
-    super(header, chunkData);
+  public static function fromBytes(bytes:Bytes):SliceChunk {
+    var chunk = new SliceChunk();
+    var bi = new BytesInput(bytes);
 
-    numSliceKeys = bytesInput.readInt32();
-    flags = bytesInput.readInt32();
-    reserved = bytesInput.readInt32();
-    name = bytesInput.readString(bytesInput.readUInt16());
+    chunk.numSliceKeys = bi.readInt32();
+    chunk.flags = bi.readInt32();
+    chunk.reserved = bi.readInt32();
+    chunk.name = bi.readString(bi.readUInt16());
 
-    for (n in 0...numSliceKeys) {
+    for (_ in 0...chunk.numSliceKeys) {
       var sliceKey:SliceKey = new SliceKey();
-      sliceKey.frameNumber = bytesInput.readInt32();
-      sliceKey.xOrigin = bytesInput.readInt32();
-      sliceKey.yOrigin = bytesInput.readInt32();
-      sliceKey.width = bytesInput.readInt32();
-      sliceKey.height = bytesInput.readInt32();
+      sliceKey.frameNumber = bi.readInt32();
+      sliceKey.xOrigin = bi.readInt32();
+      sliceKey.yOrigin = bi.readInt32();
+      sliceKey.width = bi.readInt32();
+      sliceKey.height = bi.readInt32();
 
-      if (flags & (1 << 0) != 0) {
-        has9Slices = true;
-        sliceKey.xCenter = bytesInput.readInt32();
-        sliceKey.yCenter = bytesInput.readInt32();
-        sliceKey.centerWidth = bytesInput.readInt32();
-        sliceKey.centerHeight = bytesInput.readInt32();
+      if (chunk.flags & (1 << 0) != 0) {
+        chunk.has9Slices = true;
+        sliceKey.xCenter = bi.readInt32();
+        sliceKey.yCenter = bi.readInt32();
+        sliceKey.centerWidth = bi.readInt32();
+        sliceKey.centerHeight = bi.readInt32();
       }
 
-      if (flags & (1 << 1) != 0) {
-        hasPivot = true;
-        sliceKey.xPivot = bytesInput.readInt32();
-        sliceKey.yPivot = bytesInput.readInt32();
+      if (chunk.flags & (1 << 1) != 0) {
+        chunk.hasPivot = true;
+        sliceKey.xPivot = bi.readInt32();
+        sliceKey.yPivot = bi.readInt32();
       }
 
-      sliceKeys.push(sliceKey);
+      chunk.sliceKeys.push(sliceKey);
     }
+
+    return chunk;
+  }
+
+  private function new(?createHeader:Bool = false) {
+    super(createHeader, SLICE);
   }
 }

@@ -2,11 +2,11 @@
   "name": "ase",
   "url": "https://github.com/miriti/ase",
   "license": "MIT",
-  "tags": ["aseprite", "ase", "format"],
-  "description": "Aseprite file format parser",
-  "version": "1.1.1",
+  "tags": ["aseprite", "ase", "format", "pixelart", "gamedev"],
+  "description": "Aseprite file format reader/writer",
+  "version": "2.0.0",
   "classPath": "src",
-  "releasenote": "Aseprite class renamed to Ase",
-  "contributors": ["miriti"],
+  "releasenote": "Creating new files and converting them to bytes. Getting rid of the Std.is deprecation message",
+  "contributors": ["miriti", "AustinEast"],
   "dependencies": {}
 }

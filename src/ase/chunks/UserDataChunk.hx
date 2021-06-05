@@ -1,6 +1,7 @@
 package ase.chunks;
 
 import haxe.io.Bytes;
+import haxe.io.BytesInput;
 
 class UserDataChunk extends Chunk {
   public var flags:Int;
@@ -12,23 +13,30 @@ class UserDataChunk extends Chunk {
   public var blue:Int;
   public var alpha:Int;
 
-  public function new(header:ChunkHeader, chunkData:Bytes) {
-    super(header, chunkData);
+  public static function fromBytes(bytes:Bytes):UserDataChunk {
+    var chunk = new UserDataChunk();
+    var bytesInput = new BytesInput(bytes);
 
-    flags = bytesInput.readInt32();
+    chunk.flags = bytesInput.readInt32();
 
-    hasText = flags & (1 << 0) != 0;
-    hasColor = flags & (1 << 1) != 0;
+    chunk.hasText = chunk.flags & (1 << 0) != 0;
+    chunk.hasColor = chunk.flags & (1 << 1) != 0;
 
-    if (hasText) {
-      text = bytesInput.readString(bytesInput.readUInt16());
+    if (chunk.hasText) {
+      chunk.text = bytesInput.readString(bytesInput.readUInt16());
     }
 
-    if (hasColor) {
-      red = bytesInput.readByte();
-      green = bytesInput.readByte();
-      blue = bytesInput.readByte();
-      alpha = bytesInput.readByte();
+    if (chunk.hasColor) {
+      chunk.red = bytesInput.readByte();
+      chunk.green = bytesInput.readByte();
+      chunk.blue = bytesInput.readByte();
+      chunk.alpha = bytesInput.readByte();
     }
+
+    return chunk;
+  }
+
+  public function new(?createHeader:Bool = false) {
+    super(createHeader, USER_DATA);
   }
 }

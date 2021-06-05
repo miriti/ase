@@ -1,7 +1,7 @@
 package ase.chunks;
 
-import haxe.io.BytesInput;
 import haxe.io.Bytes;
+import haxe.io.BytesInput;
 
 class PaletteEntry {
   public static inline var SIZE:Int = 6;
@@ -40,20 +40,27 @@ class PaletteChunk extends Chunk {
   public var reserved:Bytes;
   public var entries:Map<Int, PaletteEntry> = [];
 
-  public function new(header:ChunkHeader, chunkData:Bytes) {
-    super(header, chunkData);
+  public static function fromBytes(bytes:Bytes):PaletteChunk {
+    var chunk = new PaletteChunk();
 
-    paletteSize = bytesInput.readInt32();
-    firstColorIndex = bytesInput.readInt32();
-    lastColorIndex = bytesInput.readInt32();
-    reserved = bytesInput.read(8);
+    var bi = new BytesInput(bytes);
+    chunk.paletteSize = bi.readInt32();
+    chunk.firstColorIndex = bi.readInt32();
+    chunk.lastColorIndex = bi.readInt32();
+    chunk.reserved = bi.read(8);
 
     var entryStart:Int = 20;
 
-    for (entryNum in firstColorIndex...lastColorIndex + 1) {
-      var entry:PaletteEntry = new PaletteEntry(bytesInput.read(PaletteEntry.SIZE));
-      entries.set(entryNum, entry);
+    for (entryNum in chunk.firstColorIndex...chunk.lastColorIndex + 1) {
+      var entry:PaletteEntry = new PaletteEntry(bi.read(PaletteEntry.SIZE));
+      chunk.entries.set(entryNum, entry);
       entryStart += PaletteEntry.SIZE;
     }
+
+    return chunk;
+  }
+
+  private function new(?createHeader:Bool = false) {
+    super(createHeader, PALETTE);
   }
 }

@@ -1,71 +1,108 @@
-import massive.munit.client.PrintClient;
-import massive.munit.client.RichPrintClient;
-import massive.munit.client.HTTPClient;
-import massive.munit.client.JUnitReportClient;
-import massive.munit.client.SummaryReportClient;
-import massive.munit.TestRunner;
+package;
 
-/**
- * Auto generated Test Application.
- * Refer to munit command line tool for more information (haxelib run munit)
- */
+import haxe.io.Bytes;
+import ase.Ase;
+import ase.AseHeader;
+import ase.types.ChunkType;
+import sys.io.File;
+
+enum TermColor {
+  NEUTRAL;
+  GREEN;
+  RED;
+}
+
 class TestMain {
+  function print(text:String, color:TermColor = NEUTRAL) {
+    Sys.stdout().writeString('\u001b[0m');
+    switch (color) {
+      case GREEN:
+        Sys.stdout().writeString('\u001b[32m');
+      case RED:
+        Sys.stdout().writeString('\u001b[31m');
+      case _:
+    }
+    Sys.stdout().writeString('$text\n');
+    Sys.stdout().writeString('\u001b[0m');
+  }
+
+  function assert(name:String, assertion:Void->Bool) {
+    var result:Bool = false;
+    var errorMsg:String = 'Returned FALSE';
+    try {
+      result = assertion();
+    } catch (error) {
+      result = false;
+      errorMsg = '${error.message}\n${error.details()}';
+    }
+
+    print('  ${result ? 'SUCCESS' : '   FAIL'}: $name', result ? GREEN : RED);
+    if (!result)
+      print('      ERROR: $errorMsg', RED);
+  }
+
+  function run(name:String, test:Void->Void) {
+    print('Running $name:');
+    test();
+  }
+
+  function new() {
+    run('Basic Parsing', () -> {
+      var ase:Ase;
+
+      assert('test_files/128x128_rgba.aseprite loaded without errors', () -> {
+        ase = Ase.fromBytes(File.read('test_files/128x128_rgba.aseprite')
+          .readAll());
+        return true;
+      });
+      assert('Correct Magic Number',
+        () -> ase.header.magic == AseHeader.ASEPRITE_MAGIC);
+
+      assert('Width and Height are equal 128',
+        () -> ((ase.width == 128) && (ase.height == 128)));
+
+      assert('File contains only one frame', () -> ase.frames.length == 1);
+
+      assert('Color depth is 32 bits', () -> ase.header.colorDepth == 32);
+    });
+
+    run('More Parsing', () -> {
+      var ase:Ase;
+
+      assert('Loading file test_files/slices.aseprite', () -> {
+        ase = Ase.fromBytes(File.read('test_files/slices.aseprite').readAll());
+        return true;
+      });
+
+      assert('There are exactly 4 slices',
+        () -> ase.frames[0].chunkTypes[ChunkType.SLICE].length == 4);
+
+      assert('User data contains the expected string',
+        () ->
+          ase.frames[0].chunkTypes[ChunkType.SLICE][0].userData.text == 'User Data + Blue color');
+    });
+
+    run('Writing Files', () -> {
+      var ase:Ase;
+      assert('Create a new Ase instance', () -> {
+        ase = Ase.create(16, 16);
+        return true;
+      });
+
+      var bytes:Bytes;
+      assert('Convert to bytes', () -> {
+        bytes = ase.toBytes();
+        return true;
+      });
+
+      assert('Store bytes to file', () -> {
+        File.saveBytes('test_files/tmp01.aseprite', bytes);
+        return true;
+      });
+    });
+  }
+
   static function main() {
     new TestMain();
-  }
-
-  public function new() {
-    var suites = new Array<Class<massive.munit.TestSuite>>();
-    suites.push(TestSuite);
-
-    #if MCOVER
-    var client = new mcover.coverage.munit.client.MCoverPrintClient();
-    var httpClient = new HTTPClient(new mcover.coverage.munit.client.MCoverSummaryReportClient());
-    #else
-    var client = new RichPrintClient();
-    var httpClient = new HTTPClient(new SummaryReportClient());
-    #end
-
-    var runner:TestRunner = new TestRunner(client);
-    runner.addResultClient(httpClient);
-    // runner.addResultClient(new HTTPClient(new JUnitReportClient()));
-
-    runner.completionHandler = completionHandler;
-
-    #if (js && !nodejs)
-    var seconds = 0; // edit here to add some startup delay
-    function delayStartup() {
-      if (seconds > 0) {
-        seconds--;
-        js.Browser.document.getElementById("munit")
-          .innerHTML = "Tests will start in " + seconds + "s...";
-        haxe.Timer.delay(delayStartup, 1000);
-      } else {
-        js.Browser.document.getElementById("munit").innerHTML = "";
-        runner.run(suites);
-      }
-    }
-    delayStartup();
-    #else
-    runner.run(suites);
-    #end
-  }
-
-  /**
-   * updates the background color and closes the current browser
-   * for flash and html targets (useful for continous integration servers)
-   */
-  function completionHandler(successful:Bool) {
-    try {
-      #if flash
-      flash.external.ExternalInterface.call("testResult", successful);
-      #elseif js
-      js.Lib.eval("testResult(" + successful + ");");
-      #elseif (neko || cpp || java || cs || python || php || hl || eval)
-      Sys.exit(0);
-      #end
-    }
-    // if run from outside browser can get error which we can ignore
-    catch (e:Dynamic) {}
   }
 }
