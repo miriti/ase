@@ -77,16 +77,18 @@ class Ase {
   }
 
   public function toBytes():Bytes {
-    trace('File Size: $fileSize');
-
     header.fileSize = fileSize;
     header.frames = frames.length;
 
     var bo = new BytesOutput();
     var headerBytes = header.toBytes();
+
     bo.writeBytes(headerBytes, 0, headerBytes.length);
 
-    for (frame in frames) {}
+    for (frame in frames) {
+      var frameBytes = frame.toBytes();
+      bo.writeBytes(frameBytes, 0, frameBytes.length);
+    }
 
     return bo.getBytes();
   }

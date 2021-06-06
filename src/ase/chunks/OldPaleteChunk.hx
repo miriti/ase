@@ -2,6 +2,9 @@ package ase.chunks;
 
 import haxe.io.Bytes;
 import haxe.io.BytesInput;
+import haxe.io.BytesOutput;
+
+using Lambda;
 
 typedef Packet = {
   skipEntries:Int,
@@ -12,6 +15,15 @@ typedef Packet = {
 class OldPaleteChunk extends Chunk {
   public var numPackets:Int;
   public var packets:Array<Packet> = [];
+
+  override function getSizeWithoutHeader():Int {
+    return 2 // numPackets
+      + packets.map(packet -> {
+        return 1 // skipEntries
+          + 1 // numColors
+          + (packet.colors.length * 3);
+      }).fold((packetSize:Int, result:Int) -> packetSize + result, 0);
+  }
 
   public static function fromBytes(bytes:Bytes):OldPaleteChunk {
     var chunk = new OldPaleteChunk();
@@ -38,6 +50,27 @@ class OldPaleteChunk extends Chunk {
     }
 
     return chunk;
+  }
+
+  override function toBytes():Bytes {
+    var bo = new BytesOutput();
+
+    getHeaderBytes(bo);
+
+    bo.writeUInt16(numPackets);
+
+    for (packet in packets) {
+      bo.writeByte(packet.skipEntries);
+      bo.writeByte(packet.numColors);
+
+      for (c in packet.colors) {
+        bo.writeByte(c.red);
+        bo.writeByte(c.green);
+        bo.writeByte(c.blue);
+      }
+    }
+
+    return bo.getBytes();
   }
 
   private function new(?createHeader:Bool = false) {

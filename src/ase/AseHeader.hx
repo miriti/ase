@@ -60,8 +60,8 @@ class AseHeader {
     header.colorsNumber = bi.readUInt16();
     header.pixelWidth = bi.readByte();
     header.pixelHeight = bi.readByte();
-    header.gridX = bi.readByte();
-    header.gridY = bi.readByte();
+    header.gridX = bi.readInt16();
+    header.gridY = bi.readInt16();
     header.gridWidth = bi.readUInt16();
     header.gridHeight = bi.readUInt16();
     header.reserved = bi.read(84);
@@ -73,7 +73,7 @@ class AseHeader {
     var bo = new BytesOutput();
 
     bo.writeInt32(fileSize);
-    bo.writeUInt16(ASEPRITE_MAGIC);
+    bo.writeUInt16(magic);
     bo.writeUInt16(frames);
     bo.writeUInt16(width);
     bo.writeUInt16(height);
@@ -88,15 +88,13 @@ class AseHeader {
     bo.writeUInt16(colorsNumber);
     bo.writeByte(pixelWidth);
     bo.writeByte(pixelHeight);
-    bo.writeByte(gridX);
-    bo.writeByte(gridY);
+    bo.writeInt16(gridX);
+    bo.writeInt16(gridY);
     bo.writeUInt16(gridWidth);
     bo.writeUInt16(gridHeight);
 
-    final RESERVED:Int = 84;
-    var empty = Bytes.alloc(RESERVED);
-    empty.fill(0, RESERVED, 0);
-    bo.writeBytes(empty, 0, RESERVED); // reserved
+    for (_ in 0...84)
+      bo.writeByte(0);
 
     return bo.getBytes();
   }

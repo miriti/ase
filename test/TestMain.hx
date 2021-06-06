@@ -1,10 +1,12 @@
 package;
 
-import haxe.io.Bytes;
 import ase.Ase;
 import ase.AseHeader;
 import ase.types.ChunkType;
+import haxe.io.Bytes;
 import sys.io.File;
+
+using Type;
 
 enum TermColor {
   NEUTRAL;
@@ -26,19 +28,32 @@ class TestMain {
     Sys.stdout().writeString('\u001b[0m');
   }
 
+  function report(name:String, success:Bool, ?errorMessage:String) {
+    print('   ${success ? 'SUCCESS' : 'FAIL   '}: $name',
+      success ? GREEN : RED);
+    if (!success && errorMessage != null)
+      print('            ERROR: $errorMessage', RED);
+  }
+
   function assert(name:String, assertion:Void->Bool) {
     var result:Bool = false;
-    var errorMsg:String = 'Returned FALSE';
+    var errorMsg:String = 'Assertion is FALSE';
     try {
       result = assertion();
     } catch (error) {
       result = false;
-      errorMsg = '${error.message}\n${error.details()}';
+      errorMsg = '${error.message}';
     }
 
-    print('  ${result ? 'SUCCESS' : '   FAIL'}: $name', result ? GREEN : RED);
-    if (!result)
-      print('      ERROR: $errorMsg', RED);
+    report(name, result, errorMsg);
+  }
+
+  function assertEqual<T>(name:String, expect:T, got:T) {
+    if (expect == got) {
+      report(name, true);
+    } else {
+      report(name, false, 'Expecting $expect, got: $got');
+    }
   }
 
   function run(name:String, test:Void->Void) {
@@ -82,7 +97,71 @@ class TestMain {
           ase.frames[0].chunkTypes[ChunkType.SLICE][0].userData.text == 'User Data + Blue color');
     });
 
-    run('Writing Files', () -> {
+    run('Parsing and writing', () -> {
+      for (testFile in ['128x128_rgba.aseprite', 'slices.aseprite']) {
+        var bytes = File.getBytes('test_files/$testFile');
+        var ase:Ase;
+
+        assert('File $testFile read', () -> {
+          ase = Ase.fromBytes(bytes);
+
+          return true;
+        });
+
+        for (frame in ase.frames) {
+          for (chunk in frame.chunks) {
+            assertEqual(chunk.getClass().getClassName().split('.').pop()
+              + ' read header size equals to calculated',
+              chunk.header.size, chunk.size);
+          }
+
+          assertEqual('Frame header size equals to calculated',
+            frame.header.size, frame.size);
+        }
+
+        assertEqual('Calculated file length is equal to amount of read bytes',
+          bytes.length, ase.fileSize);
+
+        for (n in 0...ase.frames.length) {
+          var frame = ase.frames[n];
+
+          for (chunk in frame.chunks) {
+            var chunkBytes = chunk.toBytes();
+
+            assertEqual(chunk.getClass().getClassName().split('.').pop()
+              + ' written bytes size is equal to calculated',
+              chunk.size, chunkBytes.length);
+          }
+
+          var frameBytes = frame.toBytes();
+
+          assertEqual('Frame $n written bytes size is equal to frame header size',
+            frame.size, frameBytes.length);
+        }
+
+        var aseBytes = ase.toBytes();
+
+        assertEqual('Written bytes length is the same as the read one',
+          bytes.length, aseBytes.length);
+
+        assert('Written bytes are exactly the same as the read ones', () -> {
+          if (aseBytes.length != bytes.length)
+            throw 'The length is different';
+
+          for (i in 0...aseBytes.length) {
+            var wb = aseBytes.get(i);
+            var ob = bytes.get(i);
+
+            if (wb != ob)
+              throw 'Mismatching bytes at position: $i';
+          }
+
+          return true;
+        });
+      }
+    });
+
+    run('Creating and writing Files', () -> {
       var ase:Ase;
       assert('Create a new Ase instance', () -> {
         ase = Ase.create(16, 16);
@@ -92,11 +171,6 @@ class TestMain {
       var bytes:Bytes;
       assert('Convert to bytes', () -> {
         bytes = ase.toBytes();
-        return true;
-      });
-
-      assert('Store bytes to file', () -> {
-        File.saveBytes('test_files/tmp01.aseprite', bytes);
         return true;
       });
     });

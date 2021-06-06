@@ -1,8 +1,11 @@
 package ase.chunks;
 
+import haxe.io.BytesOutput;
 import haxe.Int32;
 import haxe.io.Bytes;
 import haxe.io.BytesInput;
+
+using Lambda;
 
 class SliceKey {
   public var frameNumber:Int;
@@ -28,6 +31,35 @@ class SliceChunk extends Chunk {
   public var sliceKeys:Array<SliceKey> = [];
   public var has9Slices:Bool;
   public var hasPivot:Bool;
+
+  override function getSizeWithoutHeader():Int {
+    return 4 // numSliceKeys
+      + 4 // flags
+      + 4 // reserved
+      + 2 // name string length
+      + name.length
+      + sliceKeys.map(key -> {
+        var keySize:Int = 4 // frameNumber
+          + 4 // xOrigin
+          + 4 // yOrigin
+          + 4 // width
+          + 4; // height
+
+        if (has9Slices) {
+          keySize += 4 // xCenter
+            + 4 // yCenter
+            + 4 // centerWidth
+            + 4; // centerHeight
+        }
+
+        if (hasPivot) {
+          keySize += 4 // xPivot
+            + 4; // yPivot
+        }
+
+        return keySize;
+      }).fold((keySize:Int, result:Int) -> result + keySize, 0);
+  }
 
   public static function fromBytes(bytes:Bytes):SliceChunk {
     var chunk = new SliceChunk();
@@ -64,6 +96,39 @@ class SliceChunk extends Chunk {
     }
 
     return chunk;
+  }
+
+  override function toBytes():Bytes {
+    var bo = new BytesOutput();
+    getHeaderBytes(bo);
+
+    bo.writeInt32(numSliceKeys);
+    bo.writeInt32(flags);
+    bo.writeInt32(0);
+    bo.writeUInt16(name.length);
+    bo.writeString(name);
+
+    for (key in sliceKeys) {
+      bo.writeInt32(key.frameNumber);
+      bo.writeInt32(key.xOrigin);
+      bo.writeInt32(key.yOrigin);
+      bo.writeInt32(key.width);
+      bo.writeInt32(key.height);
+
+      if (flags & (1 << 0) != 0) {
+        bo.writeInt32(key.xCenter);
+        bo.writeInt32(key.yCenter);
+        bo.writeInt32(key.centerWidth);
+        bo.writeInt32(key.centerHeight);
+      }
+
+      if (flags & (1 << 1) != 0) {
+        bo.writeInt32(key.xPivot);
+        bo.writeInt32(key.yPivot);
+      }
+    }
+
+    return bo.getBytes();
   }
 
   private function new(?createHeader:Bool = false) {

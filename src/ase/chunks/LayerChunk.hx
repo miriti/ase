@@ -1,5 +1,6 @@
 package ase.chunks;
 
+import haxe.io.BytesOutput;
 import haxe.io.Bytes;
 import haxe.io.BytesInput;
 
@@ -51,6 +52,19 @@ class LayerChunk extends Chunk {
   public var reserved:Bytes;
   public var name:String = 'New Layer';
 
+  override function getSizeWithoutHeader():Int {
+    return 2 // flags
+      + 2 // layerType
+      + 2 // childLevel
+      + 2 // defaultWith
+      + 2 // defaultHeight
+      + 2 // blendMode
+      + 1 // opacity
+      + 3 // reserved
+      + 2 // name string length
+      + name.length;
+  }
+
   public static function fromBytes(bytes:Bytes):LayerChunk {
     var chunk = new LayerChunk();
     var bi = new BytesInput(bytes);
@@ -66,6 +80,26 @@ class LayerChunk extends Chunk {
     chunk.name = bi.readString(bi.readUInt16());
 
     return chunk;
+  }
+
+  override function toBytes():Bytes {
+    var bo = new BytesOutput();
+
+    getHeaderBytes(bo);
+
+    bo.writeUInt16(flags);
+    bo.writeUInt16(layerType);
+    bo.writeUInt16(childLevel);
+    bo.writeUInt16(defaultWidth);
+    bo.writeUInt16(defaultHeight);
+    bo.writeUInt16(blendMode);
+    bo.writeByte(opacity);
+    for (_ in 0...3)
+      bo.writeByte(0);
+    bo.writeUInt16(name.length);
+    bo.writeString(name);
+
+    return bo.getBytes();
   }
 
   public function new(?createHeader:Bool = false) {

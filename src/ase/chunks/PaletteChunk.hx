@@ -2,6 +2,9 @@ package ase.chunks;
 
 import haxe.io.Bytes;
 import haxe.io.BytesInput;
+import haxe.io.BytesOutput;
+
+using Lambda;
 
 class PaletteEntry {
   public static inline var SIZE:Int = 6;
@@ -13,24 +16,57 @@ class PaletteEntry {
   public var alpha:Int;
   public var name:String;
 
-  public function new(entryData:Bytes) {
-    var bytesInput:BytesInput = new BytesInput(entryData);
+  public var hasName(get, set):Bool;
 
-    flags = bytesInput.readUInt16();
+  function get_hasName():Bool {
+    return (flags & (1 << 0) != 0);
+  }
 
-    red = bytesInput.readByte();
-    green = bytesInput.readByte();
-    blue = bytesInput.readByte();
-    alpha = bytesInput.readByte();
+  function set_hasName(val:Bool):Bool {
+    flags = val ? 1 : 0;
+    return val;
+  }
 
-    if (flags & (1 << 0) != 0) {
-      name = bytesInput.readString(bytesInput.readUInt16());
+  public static function fromBytes(bytes:Bytes):PaletteEntry {
+    var entry = new PaletteEntry();
+    var bi:BytesInput = new BytesInput(bytes);
+
+    entry.flags = bi.readUInt16();
+
+    entry.red = bi.readByte();
+    entry.green = bi.readByte();
+    entry.blue = bi.readByte();
+    entry.alpha = bi.readByte();
+
+    if (entry.hasName) {
+      entry.name = bi.readString(bi.readUInt16());
     }
+
+    return entry;
+  }
+
+  public function toBytes():Bytes {
+    var bo = new BytesOutput();
+
+    bo.writeUInt16(flags);
+    bo.writeByte(red);
+    bo.writeByte(green);
+    bo.writeByte(blue);
+    bo.writeByte(alpha);
+
+    if (hasName) {
+      bo.writeUInt16(name.length);
+      bo.writeString(name);
+    }
+
+    return bo.getBytes();
   }
 
   public function toString() {
     return 'R: $red G: $green B: $blue A: $alpha';
   }
+
+  public function new() {}
 }
 
 class PaletteChunk extends Chunk {
@@ -40,24 +76,51 @@ class PaletteChunk extends Chunk {
   public var reserved:Bytes;
   public var entries:Map<Int, PaletteEntry> = [];
 
+  override function getSizeWithoutHeader():Int {
+    return 4 // palette size
+      + 4 // firstColorIndex
+      + 4 // lastColorIndex
+      + 8 // reserved
+      + PaletteEntry.SIZE * (lastColorIndex - firstColorIndex + 1);
+  }
+
   public static function fromBytes(bytes:Bytes):PaletteChunk {
     var chunk = new PaletteChunk();
-
     var bi = new BytesInput(bytes);
+
     chunk.paletteSize = bi.readInt32();
     chunk.firstColorIndex = bi.readInt32();
     chunk.lastColorIndex = bi.readInt32();
     chunk.reserved = bi.read(8);
 
-    var entryStart:Int = 20;
+    var entryStart:Int = bi.position;
 
     for (entryNum in chunk.firstColorIndex...chunk.lastColorIndex + 1) {
-      var entry:PaletteEntry = new PaletteEntry(bi.read(PaletteEntry.SIZE));
-      chunk.entries.set(entryNum, entry);
+      var entry = PaletteEntry.fromBytes(bi.read(PaletteEntry.SIZE));
+      chunk.entries[entryNum] = entry;
       entryStart += PaletteEntry.SIZE;
     }
 
     return chunk;
+  }
+
+  override function toBytes():Bytes {
+    var bo = new BytesOutput();
+
+    getHeaderBytes(bo);
+
+    bo.writeInt32(paletteSize);
+    bo.writeInt32(firstColorIndex);
+    bo.writeInt32(lastColorIndex);
+    for (_ in 0...8)
+      bo.writeByte(0);
+
+    for (entryNum in firstColorIndex...lastColorIndex + 1) {
+      var entryBytes = entries[entryNum].toBytes();
+      bo.writeBytes(entryBytes, 0, entryBytes.length);
+    }
+
+    return bo.getBytes();
   }
 
   private function new(?createHeader:Bool = false) {

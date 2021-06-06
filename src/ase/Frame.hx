@@ -30,8 +30,8 @@ class Frame {
   public var size(get, never):Int;
 
   function get_size():Int {
-    return FrameHeader.BYTE_SIZE
-      + chunks.fold((chunk, result) -> result + chunk.size, 0);
+    return chunks.fold((chunk, result) -> result + chunk.size,
+      FrameHeader.BYTE_SIZE);
   }
 
   public static function fromBytes(bytes:Bytes):Frame {
@@ -92,6 +92,12 @@ class Frame {
     header.numChunks = header.oldNumChunks = chunks.length;
     var headerBytes = header.toBytes();
     bo.writeBytes(headerBytes, 0, headerBytes.length);
+
+    for (chunk in chunks) {
+      var chunkBytes = chunk.toBytes();
+      bo.writeBytes(chunkBytes, 0, chunkBytes.length);
+    }
+
     return bo.getBytes();
   }
 
