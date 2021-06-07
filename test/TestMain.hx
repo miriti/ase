@@ -42,7 +42,7 @@ class TestMain {
       result = assertion();
     } catch (error) {
       result = false;
-      errorMsg = '${error.message}';
+      errorMsg = '${error.message} \n ${error.details()}';
     }
 
     report(name, result, errorMsg);
@@ -161,16 +161,61 @@ class TestMain {
       }
     });
 
-    run('Creating and writing Files', () -> {
+    run('Create a blank file', () -> {
       var ase:Ase;
-      assert('Create a new Ase instance', () -> {
-        ase = Ase.create(16, 16);
+      assert('Create a new blank sprite', () -> {
+        ase = Ase.create(128, 128);
         return true;
       });
 
       var bytes:Bytes;
       assert('Convert to bytes', () -> {
         bytes = ase.toBytes();
+        return true;
+      });
+
+      assert('Save to file test_files/tmp/blank128x128.aseprite', () -> {
+        File.saveBytes('test_files/tmp/blank128x128.aseprite', bytes);
+        return true;
+      });
+    });
+
+    run('Create pong animation programmatically', () -> {
+      var ase:Ase;
+
+      assert('Create a new blank sprite', () -> {
+        ase = Ase.create(200, 200, INDEXED,
+          [0x00000000, 0x000000ff, 0xffffffff]);
+
+        ase.addLayer('Background');
+        ase.addLayer('Ball');
+
+        // Fill Background
+        ase.frames[0].createCell(0, 200, 200).fillIndex(1);
+
+        var firstFrameBall = ase.frames[0].createCell(1, 20, 20);
+        firstFrameBall.fillIndex(2);
+        firstFrameBall.yPosition = 90;
+
+        for (n in 1...20) {
+          var frame = ase.addFrame(50);
+          frame.linkCel(0, 0);
+
+          var ball = frame.createCell(1, 20, 20);
+          ball.fillIndex(2);
+          ball.yPosition = 90;
+
+          if (n < 10)
+            ball.xPosition = Std.int(200 * (n / 10));
+          else
+            ball.xPosition = Std.int(180 - 200 * ((n - 10) / 10));
+        }
+
+        return true;
+      });
+
+      assert('Save to file test_files/tmp/pong.aseprite', () -> {
+        File.saveBytes('test_files/tmp/pong.aseprite', ase.toBytes());
         return true;
       });
     });

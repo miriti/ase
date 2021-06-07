@@ -2,8 +2,6 @@ package ase;
 
 import ase.chunks.CelChunk;
 import ase.chunks.Chunk;
-import ase.chunks.ColorProfileChunk;
-import ase.chunks.LayerChunk;
 import ase.types.ChunkType;
 import haxe.io.Bytes;
 import haxe.io.BytesInput;
@@ -12,11 +10,16 @@ import haxe.io.BytesOutput;
 using Lambda;
 
 class Frame {
+  public var ase:Ase;
+
   public var header:FrameHeader;
+
   public var chunks:Array<Chunk> = [];
-  public var chunkTypes:Map<Int, Array<Chunk>> = [];
+  public var chunkTypes:Map<ChunkType, Array<Chunk>> = [];
 
   public var duration(get, set):Int;
+
+  private var cels:Map<Int, Cel> = [];
 
   function get_duration():Int
     return header.duration;
@@ -34,9 +37,9 @@ class Frame {
       FrameHeader.BYTE_SIZE);
   }
 
-  public static function fromBytes(bytes:Bytes):Frame {
+  public static function fromBytes(bytes:Bytes, ?ase:Ase):Frame {
     var bi:BytesInput = new BytesInput(bytes);
-    var frame = new Frame();
+    var frame = new Frame(ase);
 
     frame.header = FrameHeader.fromBytes(bi.read(FrameHeader.BYTE_SIZE));
 
@@ -48,13 +51,18 @@ class Frame {
       var chunk:Chunk = Chunk.fromBytes(chunkBytes);
 
       if (lastChunk != null) {
-        if (chunk.header.type == ChunkType.USER_DATA) {
+        if (chunk.header.type == USER_DATA) {
           lastChunk.userData = cast chunk;
         }
 
-        if (chunk.header.type == ChunkType.CEL_EXTRA
-          && lastChunk.header.type == ChunkType.CEL) {
+        if (chunk.header.type == CEL_EXTRA && lastChunk.header.type == CEL) {
           cast(lastChunk, CelChunk).extra = cast chunk;
+        }
+
+        if (chunk.header.type == CEL) {
+          var celChunk:CelChunk = cast chunk;
+          frame.cels[celChunk.layerIndex] = new Cel(celChunk, frame,
+            celChunk.layerIndex);
         }
       }
 
@@ -62,15 +70,6 @@ class Frame {
 
       lastChunk = chunk;
     }
-    return frame;
-  }
-
-  public static function createFirstFrame():Frame {
-    var frame = new Frame();
-    frame.createHeader();
-    frame.addChunk(new ColorProfileChunk(true));
-    frame.addChunk(new LayerChunk(true));
-
     return frame;
   }
 
@@ -82,8 +81,51 @@ class Frame {
       chunkTypes[chunk.header.type].push(chunk);
   }
 
+  /**
+    Access a cel at specific layer
+
+    @param layerIndex Index of the layer
+    @param replace Place this cel at a specific layer
+   */
+  public function cel(layerIndex:Int, ?replace:Cel):Cel {
+    if (replace != null) {
+      var existingCel = cels[layerIndex];
+      if (existingCel != null) {
+        removeChunk(existingCel.chunk);
+      }
+
+      addChunk(replace.chunk);
+      cels[layerIndex] = replace;
+      replace.layerIndex = layerIndex;
+    }
+
+    return cels[layerIndex];
+  }
+
+  public function createCell(layerIndex:Int, width:Int, height:Int):Cel {
+    var newCel = new Cel(this, layerIndex, width, height);
+    addChunk(newCel.chunk);
+    cels[layerIndex] = newCel;
+    return newCel;
+  }
+
+  public function linkCel(layerIndex:Int, frameIndex:Int) {
+    var newCel = new Cel(this, layerIndex);
+    newCel.link(frameIndex);
+    addChunk(newCel.chunk);
+    cels[layerIndex] = newCel;
+    return newCel;
+  }
+
+  public function clearCel(layerIndex:Int) {}
+
   public function createHeader() {
     header = new FrameHeader();
+  }
+
+  public function removeChunk(chunk:Chunk) {
+    chunks.remove(chunk);
+    chunkTypes[chunk.header.type].remove(chunk);
   }
 
   public function toBytes():Bytes {
@@ -101,8 +143,13 @@ class Frame {
     return bo.getBytes();
   }
 
-  public function new(?header:FrameHeader) {
+  public function new(?header:FrameHeader, ?ase:Ase) {
     if (header != null)
       this.header = header;
+    else
+      this.header = new FrameHeader();
+
+    if (ase != null)
+      this.ase = ase;
   }
 }

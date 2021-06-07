@@ -23,7 +23,7 @@ class PaletteEntry {
   }
 
   function set_hasName(val:Bool):Bool {
-    flags = val ? 1 : 0;
+    flags = flags | (val ? 1 : 0);
     return val;
   }
 
@@ -66,13 +66,25 @@ class PaletteEntry {
     return 'R: $red G: $green B: $blue A: $alpha';
   }
 
-  public function new() {}
+  public function new(?name:String, ?color:Int) {
+    if (name != null) {
+      this.name = name;
+      hasName = true;
+    }
+
+    if (color != null) {
+      red = (color >> 24) & 0xff;
+      green = (color >> 16) & 0xff;
+      blue = (color >> 8) & 0xff;
+      alpha = color & 0xff;
+    }
+  }
 }
 
 class PaletteChunk extends Chunk {
-  public var paletteSize:Int;
-  public var firstColorIndex:Int;
-  public var lastColorIndex:Int;
+  public var paletteSize:Int = 0;
+  public var firstColorIndex:Int = 0;
+  public var lastColorIndex:Int = -1;
   public var reserved:Bytes;
   public var entries:Map<Int, PaletteEntry> = [];
 
@@ -82,6 +94,12 @@ class PaletteChunk extends Chunk {
       + 4 // lastColorIndex
       + 8 // reserved
       + PaletteEntry.SIZE * (lastColorIndex - firstColorIndex + 1);
+  }
+
+  public function addEntry(entry:PaletteEntry) {
+    lastColorIndex++;
+    entries[lastColorIndex] = entry;
+    paletteSize++;
   }
 
   public static function fromBytes(bytes:Bytes):PaletteChunk {
@@ -123,7 +141,7 @@ class PaletteChunk extends Chunk {
     return bo.getBytes();
   }
 
-  private function new(?createHeader:Bool = false) {
+  public function new(?createHeader:Bool = false) {
     super(createHeader, PALETTE);
   }
 }

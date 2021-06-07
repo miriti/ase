@@ -50,6 +50,18 @@ class CelExtraChunk extends Chunk {
     return bo.getBytes();
   }
 
+  public function clone():CelExtraChunk {
+    var clonedChunk = new CelExtraChunk(true);
+
+    clonedChunk.flags = flags;
+    clonedChunk.preciseXPosition = preciseXPosition;
+    clonedChunk.preciseYPosition = preciseYPosition;
+    clonedChunk.widthInSprite = widthInSprite;
+    clonedChunk.heightInSprite = heightInSprite;
+
+    return clonedChunk;
+  }
+
   private function new(?createHeader:Bool = false) {
     super(createHeader, CEL_EXTRA);
   }

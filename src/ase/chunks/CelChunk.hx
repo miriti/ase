@@ -4,17 +4,18 @@ import ase.types.CelType;
 import haxe.io.Bytes;
 import haxe.io.BytesInput;
 import haxe.io.BytesOutput;
+import haxe.zip.Compress;
 import haxe.zip.InflateImpl;
 
 class CelChunk extends Chunk {
-  public var layerIndex:Int;
-  public var xPosition:Int;
-  public var yPosition:Int;
-  public var opacity:Int;
-  public var celType:CelType;
+  public var layerIndex:Int = 0;
+  public var xPosition:Int = 0;
+  public var yPosition:Int = 0;
+  public var opacity:Int = 255;
+  public var celType:CelType = CompressedImage;
   public var reserved:Bytes;
-  public var width:Int;
-  public var height:Int;
+  public var width:Int = 0;
+  public var height:Int = 0;
   public var linkedFrame:Int;
   public var extra:CelExtraChunk;
   public var rawData:Bytes;
@@ -76,6 +77,33 @@ class CelChunk extends Chunk {
     return chunk;
   }
 
+  public function clone():CelChunk {
+    var clonedChunk = new CelChunk(true);
+    clonedChunk.layerIndex = layerIndex;
+    clonedChunk.xPosition = xPosition;
+    clonedChunk.yPosition = yPosition;
+    clonedChunk.opacity = opacity;
+    clonedChunk.celType = celType;
+    clonedChunk.width = width;
+    clonedChunk.height = height;
+    clonedChunk.linkedFrame = linkedFrame;
+    if (extra != null)
+      clonedChunk.extra = extra.clone();
+    if (celType != Linked) {
+      if (rawData != null) {
+        clonedChunk.rawData = Bytes.alloc(rawData.length);
+        clonedChunk.rawData.blit(0, rawData, 0, rawData.length);
+      }
+
+      if (compressedData != null) {
+        clonedChunk.compressedData = Bytes.alloc(compressedData.length);
+        clonedChunk.compressedData.blit(0, compressedData, 0,
+          compressedData.length);
+      }
+    }
+    return clonedChunk;
+  }
+
   override function toBytes():Bytes {
     var bo = new BytesOutput();
 
@@ -106,7 +134,11 @@ class CelChunk extends Chunk {
     return bo.getBytes();
   }
 
-  private function new(?createHeader:Bool = false) {
+  public function compressData() {
+    compressedData = Compress.run(rawData, 9);
+  }
+
+  public function new(?createHeader:Bool = false) {
     super(createHeader, CEL);
   }
 }

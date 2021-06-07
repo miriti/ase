@@ -6,9 +6,9 @@ import haxe.io.BytesInput;
 import haxe.io.BytesOutput;
 
 class ColorProfileChunk extends Chunk {
-  public var colorProfileType:ColorProfileType = NoColorProfile;
-  public var flags:Int = 1;
-  public var gamma:Float = 1.0;
+  public var colorProfileType:ColorProfileType = SRgb;
+  public var flags:Int = 0;
+  public var gamma:Float = 0;
   public var reserved:Bytes;
   public var iccProfileData:Bytes;
 
