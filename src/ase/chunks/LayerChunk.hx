@@ -1,8 +1,8 @@
 package ase.chunks;
 
-import haxe.io.BytesOutput;
 import haxe.io.Bytes;
 import haxe.io.BytesInput;
+import haxe.io.BytesOutput;
 
 @:enum abstract LayerFlags(Int) from Int to Int {
   var Visible = 1;
@@ -82,10 +82,10 @@ class LayerChunk extends Chunk {
     return chunk;
   }
 
-  override function toBytes():Bytes {
-    var bo = new BytesOutput();
+  override function toBytes(?out:BytesOutput):Bytes {
+    var bo = out != null ? out : new BytesOutput();
 
-    getHeaderBytes(bo);
+    writeHeaderBytes(bo);
 
     bo.writeUInt16(flags);
     bo.writeUInt16(layerType);

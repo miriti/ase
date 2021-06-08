@@ -1,10 +1,11 @@
 package ase;
 
-import haxe.io.BytesOutput;
+import ase.types.Serializable;
 import haxe.io.Bytes;
 import haxe.io.BytesInput;
+import haxe.io.BytesOutput;
 
-class FrameHeader {
+class FrameHeader implements Serializable {
   public static final BYTE_SIZE:Int = 16;
   public static final MAGIC:Int = 0xF1FA;
 
@@ -34,8 +35,8 @@ class FrameHeader {
     return header;
   }
 
-  public function toBytes():Bytes {
-    var bo = new BytesOutput();
+  public function toBytes(?out:BytesOutput):Bytes {
+    var bo = out != null ? out : new BytesOutput();
 
     bo.writeInt32(size);
     bo.writeUInt16(magic);

@@ -3,13 +3,14 @@ package ase;
 import ase.chunks.CelChunk;
 import ase.chunks.Chunk;
 import ase.types.ChunkType;
+import ase.types.Serializable;
 import haxe.io.Bytes;
 import haxe.io.BytesInput;
 import haxe.io.BytesOutput;
 
 using Lambda;
 
-class Frame {
+class Frame implements Serializable {
   public var ase:Ase;
 
   public var header:FrameHeader;
@@ -102,8 +103,24 @@ class Frame {
     return cels[layerIndex];
   }
 
-  public function createCell(layerIndex:Int, width:Int, height:Int):Cel {
+  /**
+    Create Cel
+
+    @param layerIndex Index of the layer to create new cel on
+    @param width Cel width
+    @param height Cel height
+    @param xPosition Cel x position
+    @param yPosition Cel y position
+   */
+  public function createCel(layerIndex:Int, width:Int, height:Int,
+      ?xPosition:Int, ?yPosition:Int):Cel {
     var newCel = new Cel(this, layerIndex, width, height);
+
+    if (xPosition != null)
+      newCel.xPosition = xPosition;
+    if (yPosition != null)
+      newCel.yPosition = yPosition;
+
     addChunk(newCel.chunk);
     cels[layerIndex] = newCel;
     return newCel;
@@ -128,16 +145,16 @@ class Frame {
     chunkTypes[chunk.header.type].remove(chunk);
   }
 
-  public function toBytes():Bytes {
-    var bo = new BytesOutput();
+  public function toBytes(?out:BytesOutput):Bytes {
+    var bo = out != null ? out : new BytesOutput();
+
     header.size = size;
     header.numChunks = header.oldNumChunks = chunks.length;
-    var headerBytes = header.toBytes();
-    bo.writeBytes(headerBytes, 0, headerBytes.length);
+
+    header.toBytes(bo);
 
     for (chunk in chunks) {
-      var chunkBytes = chunk.toBytes();
-      bo.writeBytes(chunkBytes, 0, chunkBytes.length);
+      chunk.toBytes(bo);
     }
 
     return bo.getBytes();

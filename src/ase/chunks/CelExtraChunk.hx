@@ -35,9 +35,10 @@ class CelExtraChunk extends Chunk {
     return chunk;
   }
 
-  override function toBytes():Bytes {
-    var bo = new BytesOutput();
-    getHeaderBytes(bo);
+  override function toBytes(?out:BytesOutput):Bytes {
+    var bo = out != null ? out : new BytesOutput();
+
+    writeHeaderBytes(bo);
 
     bo.writeUInt16(flags);
     bo.writeFloat(preciseXPosition);

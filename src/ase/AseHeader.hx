@@ -1,12 +1,13 @@
 package ase;
 
 import ase.types.ColorDepth;
+import ase.types.Serializable;
 import haxe.Int32;
 import haxe.io.Bytes;
 import haxe.io.BytesInput;
 import haxe.io.BytesOutput;
 
-class AseHeader {
+class AseHeader implements Serializable {
   public static final ASEPRITE_MAGIC:Int = 0xA5E0;
   public static final SIZE:Int = 128;
 
@@ -69,8 +70,8 @@ class AseHeader {
     return header;
   }
 
-  public function toBytes():Bytes {
-    var bo = new BytesOutput();
+  public function toBytes(?out:BytesOutput):Bytes {
+    var bo = out != null ? out : new BytesOutput();
 
     bo.writeInt32(fileSize);
     bo.writeUInt16(magic);

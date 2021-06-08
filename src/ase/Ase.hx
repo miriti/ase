@@ -3,6 +3,7 @@ package ase;
 import ase.chunks.ColorProfileChunk;
 import ase.types.ColorDepth;
 import ase.types.LayerPosition;
+import ase.types.Serializable;
 import haxe.io.Bytes;
 import haxe.io.BytesInput;
 import haxe.io.BytesOutput;
@@ -10,7 +11,7 @@ import haxe.io.BytesOutput;
 using Lambda;
 
 @:expose('Ase')
-class Ase {
+class Ase implements Serializable {
   public var header:AseHeader;
   public var frames:Array<Frame> = [];
 
@@ -132,8 +133,8 @@ class Ase {
   /**
     Create a new layer
    */
-  public function addLayer(?name:String, ?position:LayerPosition = TOP,
-      ?visible:Bool = true, ?editable:Bool = true) {
+  public function addLayer(?name:String, ?visible:Bool = true,
+      ?editable:Bool = true) {
     if (name == null)
       name = 'Layer ${layers.length + 1}';
 
@@ -142,29 +143,20 @@ class Ase {
     layer.visible = visible;
     layer.name = name;
 
-    var desiredIndex:Int = switch (position) {
-      case TOP: 0;
-      case BOTTOM: layers.length;
-      case INDEX(index):
-        index;
-    }
-
     frames[0].addChunk(layer.chunk);
     return this;
   }
 
-  public function toBytes():Bytes {
+  public function toBytes(?out:BytesOutput):Bytes {
     header.fileSize = fileSize;
     header.frames = frames.length;
 
-    var bo = new BytesOutput();
-    var headerBytes = header.toBytes();
+    var bo = out != null ? out : new BytesOutput();
 
-    bo.writeBytes(headerBytes, 0, headerBytes.length);
+    header.toBytes(bo);
 
     for (frame in frames) {
-      var frameBytes = frame.toBytes();
-      bo.writeBytes(frameBytes, 0, frameBytes.length);
+      frame.toBytes(bo);
     }
 
     return bo.getBytes();

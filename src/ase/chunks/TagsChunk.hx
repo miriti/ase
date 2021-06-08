@@ -60,10 +60,10 @@ class TagsChunk extends Chunk {
     return chunk;
   }
 
-  override function toBytes():Bytes {
-    var bo = new BytesOutput();
+  override function toBytes(?out:BytesOutput):Bytes {
+    var bo = out != null ? out : new BytesOutput();
 
-    getHeaderBytes(bo);
+    writeHeaderBytes(bo);
 
     bo.writeUInt16(numTags);
     for (_ in 0...8)

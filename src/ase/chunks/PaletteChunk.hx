@@ -45,8 +45,8 @@ class PaletteEntry {
     return entry;
   }
 
-  public function toBytes():Bytes {
-    var bo = new BytesOutput();
+  public function toBytes(?out:BytesOutput):Bytes {
+    var bo = out != null ? out : new BytesOutput();
 
     bo.writeUInt16(flags);
     bo.writeByte(red);
@@ -122,10 +122,10 @@ class PaletteChunk extends Chunk {
     return chunk;
   }
 
-  override function toBytes():Bytes {
-    var bo = new BytesOutput();
+  override function toBytes(?out:BytesOutput):Bytes {
+    var bo = out != null ? out : new BytesOutput();
 
-    getHeaderBytes(bo);
+    writeHeaderBytes(bo);
 
     bo.writeInt32(paletteSize);
     bo.writeInt32(firstColorIndex);
@@ -134,8 +134,7 @@ class PaletteChunk extends Chunk {
       bo.writeByte(0);
 
     for (entryNum in firstColorIndex...lastColorIndex + 1) {
-      var entryBytes = entries[entryNum].toBytes();
-      bo.writeBytes(entryBytes, 0, entryBytes.length);
+      entries[entryNum].toBytes(bo);
     }
 
     return bo.getBytes();

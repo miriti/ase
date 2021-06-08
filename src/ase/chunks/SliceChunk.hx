@@ -1,9 +1,9 @@
 package ase.chunks;
 
-import haxe.io.BytesOutput;
 import haxe.Int32;
 import haxe.io.Bytes;
 import haxe.io.BytesInput;
+import haxe.io.BytesOutput;
 
 using Lambda;
 
@@ -98,9 +98,9 @@ class SliceChunk extends Chunk {
     return chunk;
   }
 
-  override function toBytes():Bytes {
-    var bo = new BytesOutput();
-    getHeaderBytes(bo);
+  override function toBytes(?out:BytesOutput):Bytes {
+    var bo = out != null ? out : new BytesOutput();
+    writeHeaderBytes(bo);
 
     bo.writeInt32(numSliceKeys);
     bo.writeInt32(flags);

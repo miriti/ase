@@ -104,10 +104,10 @@ class CelChunk extends Chunk {
     return clonedChunk;
   }
 
-  override function toBytes():Bytes {
-    var bo = new BytesOutput();
+  override function toBytes(?out:BytesOutput):Bytes {
+    var bo = out != null ? out : new BytesOutput();
 
-    getHeaderBytes(bo);
+    writeHeaderBytes(bo);
 
     bo.writeUInt16(layerIndex);
     bo.writeInt16(xPosition);

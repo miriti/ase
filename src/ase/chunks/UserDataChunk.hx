@@ -43,10 +43,10 @@ class UserDataChunk extends Chunk {
     return chunk;
   }
 
-  override function toBytes():Bytes {
-    var bo = new BytesOutput();
+  override function toBytes(?out:BytesOutput):Bytes {
+    var bo = out != null ? out : new BytesOutput();
 
-    getHeaderBytes(bo);
+    writeHeaderBytes(bo);
 
     bo.writeInt32(flags);
 

@@ -191,9 +191,9 @@ class TestMain {
         ase.addLayer('Ball');
 
         // Fill Background
-        ase.frames[0].createCell(0, 200, 200).fillIndex(1);
+        ase.frames[0].createCel(0, 200, 200).fillIndex(1);
 
-        var firstFrameBall = ase.frames[0].createCell(1, 20, 20);
+        var firstFrameBall = ase.frames[0].createCel(1, 20, 20);
         firstFrameBall.fillIndex(2);
         firstFrameBall.yPosition = 90;
 
@@ -201,7 +201,7 @@ class TestMain {
           var frame = ase.addFrame(50);
           frame.linkCel(0, 0);
 
-          var ball = frame.createCell(1, 20, 20);
+          var ball = frame.createCel(1, 20, 20);
           ball.fillIndex(2);
           ball.yPosition = 90;
 

@@ -1,5 +1,6 @@
 package ase.chunks;
 
+import ase.types.Serializable;
 import ase.types.ChunkType;
 import haxe.io.Bytes;
 import haxe.io.BytesInput;
@@ -7,7 +8,7 @@ import haxe.io.BytesOutput;
 
 using Type;
 
-class Chunk {
+class Chunk implements Serializable {
   public var header:ChunkHeader;
   public var userData:UserDataChunk;
 
@@ -57,18 +58,13 @@ class Chunk {
     return chunk;
   }
 
-  function getHeaderBytes(?bo:BytesOutput):Bytes {
+  function writeHeaderBytes(out:BytesOutput) {
     header.size = size;
-    var bytes = header.toBytes();
-
-    if (bo != null)
-      bo.writeBytes(bytes, 0, bytes.length);
-
-    return bytes;
+    header.toBytes(out);
   }
 
-  public function toBytes():Bytes {
-    throw '${this.getClass().getClassName().split('.').pop()}.toBytest() is not implemented';
+  public function toBytes(?out:BytesOutput):Bytes {
+    throw '${this.getClass().getClassName().split('.').pop()}.toBytes() is not implemented';
   }
 
   private function new(?createHeader:Bool = false, ?type:ChunkType) {

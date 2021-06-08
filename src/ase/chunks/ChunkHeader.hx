@@ -13,21 +13,21 @@ class ChunkHeader {
 
   public static function fromBytes(bytes:Bytes):ChunkHeader {
     var chunkHeader = new ChunkHeader();
-    var bytesInput:BytesInput = new BytesInput(bytes);
+    var bi:BytesInput = new BytesInput(bytes);
 
-    chunkHeader.size = bytesInput.readInt32();
-    chunkHeader.type = bytesInput.readUInt16();
+    chunkHeader.size = bi.readInt32();
+    chunkHeader.type = bi.readUInt16();
 
     return chunkHeader;
   }
 
-  public function toBytes():Bytes {
-    var bytesOutput = new BytesOutput();
+  public function toBytes(?out:BytesOutput):Bytes {
+    var bo = out != null ? out : new BytesOutput();
 
-    bytesOutput.writeInt32(size);
-    bytesOutput.writeUInt16(cast type);
+    bo.writeInt32(size);
+    bo.writeUInt16(cast type);
 
-    return bytesOutput.getBytes();
+    return bo.getBytes();
   }
 
   public function new(?type:ChunkType) {
