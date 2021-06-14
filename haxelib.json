@@ -6,7 +6,7 @@
   "description": "Aseprite file format reader/writer",
   "version": "2.0.0",
   "classPath": "src",
-  "releasenote": "Creating new files and converting them to bytes. Getting rid of the Std.is deprecation message",
+  "releasenote": "Creating files and converting them to bytes. Getting rid of the Std.is deprecation message",
   "contributors": ["miriti", "AustinEast"],
   "dependencies": {}
 }

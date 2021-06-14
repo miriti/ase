@@ -38,6 +38,12 @@ class Frame implements Serializable {
       FrameHeader.BYTE_SIZE);
   }
 
+  /**
+    Parse bytes to create a new frame
+
+    @param bytes bytes to parse
+    @param ase (optional) `ase.Ase` instance to attach the frame to
+   */
   public static function fromBytes(bytes:Bytes, ?ase:Ase):Frame {
     var bi:BytesInput = new BytesInput(bytes);
     var frame = new Frame(ase);
@@ -126,6 +132,12 @@ class Frame implements Serializable {
     return newCel;
   }
 
+  /**
+    Create a linked cel 
+
+    @param layerIndex 
+    @param frameIndex
+   */
   public function linkCel(layerIndex:Int, frameIndex:Int) {
     var newCel = new Cel(this, layerIndex);
     newCel.link(frameIndex);

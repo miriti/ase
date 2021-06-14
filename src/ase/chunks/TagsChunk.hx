@@ -18,7 +18,6 @@ typedef Tag = {
 
 class TagsChunk extends Chunk {
   public var numTags:Int;
-  public var reserved:Bytes;
   public var tags:Array<Tag> = [];
 
   override function getSizeWithoutHeader():Int {
@@ -41,7 +40,7 @@ class TagsChunk extends Chunk {
     var bi = new BytesInput(bytes);
 
     chunk.numTags = bi.readUInt16();
-    chunk.reserved = bi.read(8);
+    bi.read(8); // reserved
 
     for (_ in 0...chunk.numTags) {
       var newFrameTag:Tag = {

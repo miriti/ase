@@ -10,7 +10,6 @@ class CelExtraChunk extends Chunk {
   public var preciseYPosition:Float;
   public var widthInSprite:Float;
   public var heightInSprite:Float;
-  public var reserved:Bytes;
 
   override function getSizeWithoutHeader():Int {
     return 2 // flags
@@ -30,7 +29,7 @@ class CelExtraChunk extends Chunk {
     chunk.preciseYPosition = bi.readFloat();
     chunk.widthInSprite = bi.readFloat();
     chunk.heightInSprite = bi.readFloat();
-    chunk.reserved = bi.read(16);
+    bi.read(16);
 
     return chunk;
   }

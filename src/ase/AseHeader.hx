@@ -27,7 +27,6 @@ class AseHeader implements Serializable {
   public var gridY:Int = 0;
   public var gridWidth:Int = 16;
   public var gridHeight:Int = 16;
-  public var reserved:Bytes;
 
   public var size(get, never):Int;
 
@@ -65,7 +64,7 @@ class AseHeader implements Serializable {
     header.gridY = bi.readInt16();
     header.gridWidth = bi.readUInt16();
     header.gridHeight = bi.readUInt16();
-    header.reserved = bi.read(84);
+    bi.read(84);
 
     return header;
   }

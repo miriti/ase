@@ -49,7 +49,6 @@ class LayerChunk extends Chunk {
   public var defaultHeight:Int = 0;
   public var blendMode:LayerBlendMode = Normal;
   public var opacity:Int = 255;
-  public var reserved:Bytes;
   public var name:String = 'New Layer';
 
   override function getSizeWithoutHeader():Int {
@@ -76,7 +75,7 @@ class LayerChunk extends Chunk {
     chunk.defaultHeight = bi.readInt16();
     chunk.blendMode = bi.readInt16();
     chunk.opacity = bi.readByte();
-    chunk.reserved = bi.read(3);
+    bi.read(3);
     chunk.name = bi.readString(bi.readUInt16());
 
     return chunk;

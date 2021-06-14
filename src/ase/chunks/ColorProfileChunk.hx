@@ -9,7 +9,6 @@ class ColorProfileChunk extends Chunk {
   public var colorProfileType:ColorProfileType = SRgb;
   public var flags:Int = 0;
   public var gamma:Float = 0;
-  public var reserved:Bytes;
   public var iccProfileData:Bytes;
 
   override function getSizeWithoutHeader():Int {
@@ -33,7 +32,7 @@ class ColorProfileChunk extends Chunk {
     chunk.colorProfileType = bi.readUInt16();
     chunk.flags = bi.readUInt16();
     chunk.gamma = bi.readFloat();
-    chunk.reserved = bi.read(8);
+    bi.read(8);
 
     if (chunk.colorProfileType == EmbeddedICC) {
       var len:Int = bi.readInt32();

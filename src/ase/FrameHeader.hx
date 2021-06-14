@@ -13,7 +13,6 @@ class FrameHeader implements Serializable {
   public var magic:Int = MAGIC;
   public var oldNumChunks:Int = 0;
   public var duration:Int = 100;
-  public var reserved:Bytes;
   public var numChunks:Int = 0;
 
   public static function fromBytes(bytes:Bytes):FrameHeader {
@@ -29,7 +28,7 @@ class FrameHeader implements Serializable {
 
     header.oldNumChunks = bi.readUInt16();
     header.duration = bi.readUInt16();
-    header.reserved = bi.read(2);
+    bi.read(2);
     header.numChunks = bi.readInt32();
 
     return header;

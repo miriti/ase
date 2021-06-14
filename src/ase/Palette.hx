@@ -3,6 +3,9 @@ package ase;
 import ase.chunks.PaletteChunk;
 
 class Palette {
+  /**
+    Default paletter used by Aseprite when a new file is created
+   */
   public static final DB32 = [
     0x000000ff, 0x222034ff, 0x45283cff, 0x663931ff, 0x8f563bff, 0xdf7126ff,
     0xd9a066ff, 0xeec39aff, 0xfbf236ff, 0x99e550ff, 0x6abe30ff, 0x37946eff,

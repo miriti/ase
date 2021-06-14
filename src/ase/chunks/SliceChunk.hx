@@ -26,7 +26,6 @@ class SliceKey {
 class SliceChunk extends Chunk {
   public var numSliceKeys:Int32;
   public var flags:Int32;
-  public var reserved:Int32;
   public var name:String;
   public var sliceKeys:Array<SliceKey> = [];
   public var has9Slices:Bool;
@@ -67,7 +66,7 @@ class SliceChunk extends Chunk {
 
     chunk.numSliceKeys = bi.readInt32();
     chunk.flags = bi.readInt32();
-    chunk.reserved = bi.readInt32();
+    bi.readInt32(); // reserved
     chunk.name = bi.readString(bi.readUInt16());
 
     for (_ in 0...chunk.numSliceKeys) {

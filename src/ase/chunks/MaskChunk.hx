@@ -8,7 +8,6 @@ class MaskChunk extends Chunk {
   public var yPosition:Int;
   public var width:Int;
   public var height:Int;
-  public var reserved:Bytes;
 
   public static function fromBytes(bytes:Bytes):MaskChunk {
     var chunk = new MaskChunk();
@@ -21,7 +20,7 @@ class MaskChunk extends Chunk {
     chunk.width = bi.readUInt16();
     chunk.height = bi.readUInt16();
 
-    chunk.reserved = bi.read(8);
+    bi.read(8);
 
     // TODO: Read mask name and data. Or not as this chunk is deprecated
 

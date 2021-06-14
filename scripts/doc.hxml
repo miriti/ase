@@ -1,0 +1,11 @@
+-cp ../src
+-lib ase
+--no-output
+ImportAll
+-D doc-gen
+-xml ../bin/doc/all.xml
+-neko dummy.n
+
+--next
+-cmd rm -rf ../documentation
+-cmd haxelib run dox -i ../bin/doc/ -in ase -o ../documentation

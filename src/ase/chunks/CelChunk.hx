@@ -13,7 +13,6 @@ class CelChunk extends Chunk {
   public var yPosition:Int = 0;
   public var opacity:Int = 255;
   public var celType:CelType = CompressedImage;
-  public var reserved:Bytes;
   public var width:Int = 0;
   public var height:Int = 0;
   public var linkedFrame:Int;
@@ -54,7 +53,7 @@ class CelChunk extends Chunk {
     chunk.yPosition = bi.readInt16();
     chunk.opacity = bi.readByte();
     chunk.celType = bi.readUInt16();
-    chunk.reserved = bi.read(7);
+    bi.read(7);
 
     if (chunk.celType == Raw || chunk.celType == CompressedImage) {
       chunk.width = bi.readUInt16();

@@ -85,7 +85,6 @@ class PaletteChunk extends Chunk {
   public var paletteSize:Int = 0;
   public var firstColorIndex:Int = 0;
   public var lastColorIndex:Int = -1;
-  public var reserved:Bytes;
   public var entries:Map<Int, PaletteEntry> = [];
 
   override function getSizeWithoutHeader():Int {
@@ -109,7 +108,7 @@ class PaletteChunk extends Chunk {
     chunk.paletteSize = bi.readInt32();
     chunk.firstColorIndex = bi.readInt32();
     chunk.lastColorIndex = bi.readInt32();
-    chunk.reserved = bi.read(8);
+    bi.read(8);
 
     var entryStart:Int = bi.position;
 
