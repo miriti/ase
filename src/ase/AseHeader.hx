@@ -17,12 +17,12 @@ class AseHeader implements Serializable {
   public var width:Int;
   public var height:Int;
   public var colorDepth:ColorDepth = BPP32;
-  public var flags:Int32;
+  public var flags:Int32 = 1;
   public var speed:Int = 100;
-  public var paletteEntry:Int;
-  public var colorsNumber:Int;
-  public var pixelWidth:Int;
-  public var pixelHeight:Int;
+  public var paletteEntry:Int = 0;
+  public var colorsNumber:Int = 0;
+  public var pixelWidth:Int = 0;
+  public var pixelHeight:Int = 0;
   public var gridX:Int = 0;
   public var gridY:Int = 0;
   public var gridWidth:Int = 16;
@@ -97,6 +97,30 @@ class AseHeader implements Serializable {
       bo.writeByte(0);
 
     return bo.getBytes();
+  }
+
+  public function toString():String {
+    // @formatter:off
+    return [
+      'AseHeader:',
+      '  fileSize: $fileSize',
+      '  magic: $magic',
+      '  frames: $frames',
+      '  width: $width',
+      '  height: $height',
+      '  colorDepth: $colorDepth',
+      '  flags: $flags',
+      '  speed: $speed',
+      '  paletteEntry: $paletteEntry',
+      '  colorsNumber: $colorsNumber',
+      '  pixelWidth: $pixelWidth',
+      '  pixelHeight: $pixelHeight',
+      '  gridX: $gridX',
+      '  gridY: $gridY',
+      '  gridWidth: $gridWidth',
+      '  gridHeight: $gridHeight',
+    ].join('\n');
+    // @formatter:on
   }
 
   public function new() {}

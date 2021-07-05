@@ -48,5 +48,16 @@ class FrameHeader implements Serializable {
     return bo.getBytes();
   }
 
+  public function toString():String {
+    return [
+      'FrameHeader:',
+      '  size: $size',
+      '  magic: ${StringTools.hex(magic, 4)}',
+      '  oldNumChunks: $oldNumChunks',
+      '  duration: $duration',
+      '  numChunks: $numChunks'
+    ].join('\n');
+  }
+
   public function new() {}
 }
