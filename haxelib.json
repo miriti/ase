@@ -4,9 +4,9 @@
   "license": "MIT",
   "tags": ["aseprite", "ase", "format", "pixelart", "gamedev"],
   "description": "Aseprite file format reader/writer",
-  "version": "2.0.0",
+  "version": "2.1.0",
   "classPath": "src",
-  "releasenote": "Creating files and converting them to bytes. Getting rid of the Std.is deprecation message",
+  "releasenote": "Bugfixes and minor updates",
   "contributors": ["miriti", "AustinEast"],
   "dependencies": {}
 }

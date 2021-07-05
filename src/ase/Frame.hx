@@ -20,7 +20,7 @@ class Frame implements Serializable {
 
   public var duration(get, set):Int;
 
-  private var cels:Map<Int, Cel> = [];
+  public final cels:Map<Int, Cel> = [];
 
   function get_duration():Int
     return header.duration;
@@ -65,12 +65,12 @@ class Frame implements Serializable {
         if (chunk.header.type == CEL_EXTRA && lastChunk.header.type == CEL) {
           cast(lastChunk, CelChunk).extra = cast chunk;
         }
+      }
 
-        if (chunk.header.type == CEL) {
-          var celChunk:CelChunk = cast chunk;
-          frame.cels[celChunk.layerIndex] = new Cel(celChunk, frame,
-            celChunk.layerIndex);
-        }
+      if (chunk.header.type == CEL) {
+        var celChunk:CelChunk = cast chunk;
+        frame.cels[celChunk.layerIndex] = new Cel(celChunk, frame,
+          celChunk.layerIndex);
       }
 
       frame.addChunk(chunk);

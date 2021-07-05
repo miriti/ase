@@ -1,6 +1,8 @@
 package ase;
 
 import ase.chunks.ColorProfileChunk;
+import ase.chunks.LayerChunk;
+import ase.types.ChunkType;
 import ase.types.ColorDepth;
 import ase.types.Serializable;
 import haxe.io.Bytes;
@@ -34,6 +36,11 @@ using Lambda;
     return header.size
       + frames.fold((frame:Frame, result:Int) -> result + frame.size, 0);
   }
+
+  public var firstFrame(get, never):Frame;
+
+  function get_firstFrame():Frame
+    return frames[0];
 
   /**
     Sprite width
@@ -103,6 +110,8 @@ using Lambda;
       ase.frames.push(frame);
     }
 
+    ase.createLayers();
+
     return ase;
   }
 
@@ -115,6 +124,17 @@ using Lambda;
     firstFrame.createHeader();
     firstFrame.addChunk(new ColorProfileChunk(true));
     frames = [firstFrame];
+  }
+
+  /**
+    Create layers after ase chunks are loaded
+   */
+  function createLayers() {
+    for (chunk in firstFrame.chunkTypes[ChunkType.LAYER]) {
+      final layerChunk:LayerChunk = cast chunk;
+
+      layers.push(new Layer(layerChunk));
+    }
   }
 
   /**
@@ -168,6 +188,8 @@ using Lambda;
     layer.editable = editable;
     layer.visible = visible;
     layer.name = name;
+
+    layers.push(layer);
 
     frames[0].addChunk(layer.chunk);
     return this;
