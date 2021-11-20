@@ -70,7 +70,8 @@ class CelChunk extends Chunk {
     } else if (chunk.celType == Linked) {
       chunk.linkedFrame = bi.readUInt16();
     } else {
-      throw 'Invalid cel type: ${chunk.celType}';
+      trace('Unknown cel type: ${chunk.celType}');
+      return null;
     }
 
     return chunk;

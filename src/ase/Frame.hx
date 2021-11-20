@@ -57,25 +57,27 @@ class Frame implements Serializable {
       var chunkBytes:Bytes = bi.read(chunkSize);
       var chunk:Chunk = Chunk.fromBytes(chunkBytes);
 
-      if (lastChunk != null) {
-        if (chunk.header.type == USER_DATA) {
-          lastChunk.userData = cast chunk;
+      if (chunk != null) {
+        if (lastChunk != null) {
+          if (chunk.header.type == USER_DATA) {
+            lastChunk.userData = cast chunk;
+          }
+
+          if (chunk.header.type == CEL_EXTRA && lastChunk.header.type == CEL) {
+            cast(lastChunk, CelChunk).extra = cast chunk;
+          }
         }
 
-        if (chunk.header.type == CEL_EXTRA && lastChunk.header.type == CEL) {
-          cast(lastChunk, CelChunk).extra = cast chunk;
+        if (chunk.header.type == CEL) {
+          var celChunk:CelChunk = cast chunk;
+          frame.cels[celChunk.layerIndex] = new Cel(celChunk, frame,
+            celChunk.layerIndex);
         }
+
+        frame.addChunk(chunk);
+
+        lastChunk = chunk;
       }
-
-      if (chunk.header.type == CEL) {
-        var celChunk:CelChunk = cast chunk;
-        frame.cels[celChunk.layerIndex] = new Cel(celChunk, frame,
-          celChunk.layerIndex);
-      }
-
-      frame.addChunk(chunk);
-
-      lastChunk = chunk;
     }
     return frame;
   }

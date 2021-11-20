@@ -118,7 +118,7 @@ class Cel {
     Get pixel color or color index at given position
    */
   public function getPixel(px:Int, py:Int):Null<Int> {
-    if (px > 0 && px < width && py > 0 && py < height) {
+    if (px >= 0 && px < width && py >= 0 && py < height) {
       var p = (width * py + px) * (frame.ase.colorDepth / 8).int();
       return switch (frame.ase.colorDepth) {
         case BPP32: pixelData.getInt32(p);

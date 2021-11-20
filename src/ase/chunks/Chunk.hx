@@ -50,10 +50,12 @@ class Chunk implements Serializable {
       case USER_DATA:
         UserDataChunk.fromBytes(chunkBytes);
       case _:
-        null;
+        trace('Unknown chunk type: 0x${StringTools.hex(header.type, 4)}');
+        return null;
     }
 
-    chunk.header = header;
+    if (chunk != null)
+      chunk.header = header;
 
     return chunk;
   }
