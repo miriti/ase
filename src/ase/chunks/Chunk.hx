@@ -35,6 +35,8 @@ class Chunk implements Serializable {
         CelExtraChunk.fromBytes(chunkBytes);
       case COLOR_PROFILE:
         ColorProfileChunk.fromBytes(chunkBytes);
+      case EXTERNAL_FILES:
+        ExternalFilesChunk.fromBytes(chunkBytes);
       case LAYER:
         LayerChunk.fromBytes(chunkBytes);
       case MASK:
@@ -49,6 +51,8 @@ class Chunk implements Serializable {
         TagsChunk.fromBytes(chunkBytes);
       case USER_DATA:
         UserDataChunk.fromBytes(chunkBytes);
+      case TILESET:
+        TilesetChunk.fromBytes(chunkBytes);
       case _:
         trace('Unknown chunk type: 0x${StringTools.hex(header.type, 4)}');
         return null;

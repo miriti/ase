@@ -19,6 +19,13 @@ class CelChunk extends Chunk {
   public var extra:CelExtraChunk;
   public var rawData:Bytes;
   public var compressedData:Bytes;
+  public var bitsPerTile:Int;
+  public var bitmaskTileId:Int;
+  public var bitmaskXFlip:Int;
+  public var bitmaskYFlip:Int;
+  public var bitmask90CWRotation:Int;
+  public var compressedTilemapData:Bytes;
+  public var tilemapData:Bytes;
 
   override function getSizeWithoutHeader():Int {
     var totalSize:Int = 2 // layerIndex
@@ -28,14 +35,23 @@ class CelChunk extends Chunk {
       + 2 // celType
       + 7; // reserved
 
-    if (celType == Raw || celType == CompressedImage) {
+    if (celType == Raw || celType == CompressedImage
+      || celType == CompressedTilemap) {
       totalSize += 2 // width
         + 2; // height
 
       if (celType == CompressedImage) {
         totalSize += compressedData.length;
-      } else {
+      } else if (celType == Raw) {
         totalSize += rawData.length;
+      } else if (celType == CompressedTilemap) {
+        totalSize += 2 // Bits per tile
+          + 4 // Bitmask for tile ID
+          + 4 // Bitmask for X flip
+          + 4 // Bitmask for Y flip
+          + 4 // Bitmask for 90CW rotation
+          + 10 // Reserved
+          + compressedTilemapData.length;
       }
     } else if (celType == Linked) {
       totalSize += 2; // two bytes for linkedFrame
@@ -55,17 +71,25 @@ class CelChunk extends Chunk {
     chunk.celType = bi.readUInt16();
     bi.read(7);
 
-    if (chunk.celType == Raw || chunk.celType == CompressedImage) {
+    if (chunk.celType == Raw || chunk.celType == CompressedImage
+      || chunk.celType == CompressedTilemap) {
       chunk.width = bi.readUInt16();
       chunk.height = bi.readUInt16();
 
-      var data:Bytes = bi.read(bi.length - bi.position);
-
       if (chunk.celType == CompressedImage) {
-        chunk.compressedData = data;
-        chunk.rawData = InflateImpl.run(new BytesInput(data));
-      } else {
-        chunk.rawData = data;
+        chunk.compressedData = bi.read(bi.length - bi.position);
+        chunk.rawData = InflateImpl.run(new BytesInput(chunk.compressedData));
+      } else if (chunk.celType == Raw) {
+        chunk.rawData = bi.read(bi.length - bi.position);
+      } else if (chunk.celType == CompressedTilemap) {
+        chunk.bitsPerTile = bi.readUInt16();
+        chunk.bitmaskTileId = bi.readInt32();
+        chunk.bitmaskXFlip = bi.readInt32();
+        chunk.bitmaskYFlip = bi.readInt32();
+        chunk.bitmask90CWRotation = bi.readInt32();
+        bi.read(10); // reserved
+        chunk.compressedTilemapData = bi.read(bi.length - bi.position);
+        chunk.tilemapData = InflateImpl.run(new BytesInput(chunk.compressedTilemapData));
       }
     } else if (chunk.celType == Linked) {
       chunk.linkedFrame = bi.readUInt16();
@@ -118,13 +142,22 @@ class CelChunk extends Chunk {
       bo.writeByte(0);
 
     switch (celType) {
-      case CompressedImage | Raw:
+      case CompressedImage | Raw | CompressedTilemap:
         bo.writeUInt16(width);
         bo.writeUInt16(height);
         if (celType == CompressedImage) {
           bo.writeBytes(compressedData, 0, compressedData.length);
-        } else {
+        } else if (celType == Raw) {
           bo.writeBytes(rawData, 0, rawData.length);
+        } else if (celType == CompressedTilemap) {
+          bo.writeUInt16(bitsPerTile);
+          bo.writeInt32(bitmaskTileId);
+          bo.writeInt32(bitmaskXFlip);
+          bo.writeInt32(bitmaskYFlip);
+          bo.writeInt32(bitmask90CWRotation);
+          for (_ in 0...10)
+            bo.writeByte(0);
+          bo.writeBytes(compressedTilemapData, 0, compressedTilemapData.length);
         }
       case Linked:
         bo.writeUInt16(linkedFrame);
@@ -135,7 +168,11 @@ class CelChunk extends Chunk {
   }
 
   public function compressData() {
-    compressedData = Compress.run(rawData, 9);
+    if (celType == CompressedImage)
+      compressedData = Compress.run(rawData, 9);
+
+    if (celType == CompressedTilemap)
+      compressedTilemapData = Compress.run(tilemapData, 9);
   }
 
   public function new(?createHeader:Bool = false) {

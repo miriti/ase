@@ -17,6 +17,7 @@ import haxe.io.BytesOutput;
 @:enum abstract LayerType(Int) from Int to Int {
   var Normal = 0;
   var Group = 1;
+  var Tilemap = 2;
 }
 
 @:enum abstract LayerBlendMode(Int) from Int to Int {
@@ -50,6 +51,7 @@ class LayerChunk extends Chunk {
   public var blendMode:LayerBlendMode = Normal;
   public var opacity:Int = 255;
   public var name:String = 'New Layer';
+  public var tilesetIndex:Int;
 
   override function getSizeWithoutHeader():Int {
     return 2 // flags
@@ -61,7 +63,9 @@ class LayerChunk extends Chunk {
       + 1 // opacity
       + 3 // reserved
       + 2 // name string length
-      + name.length;
+      + name.length // name
+      +
+      (layerType == Tilemap ? 4 : 0); // Additional DWORD for tileset index if layerType == Tilemap
   }
 
   public static function fromBytes(bytes:Bytes):LayerChunk {
@@ -77,6 +81,9 @@ class LayerChunk extends Chunk {
     chunk.opacity = bi.readByte();
     bi.read(3);
     chunk.name = bi.readString(bi.readUInt16());
+
+    if (chunk.layerType == Tilemap)
+      chunk.tilesetIndex = bi.readInt32();
 
     return chunk;
   }
@@ -97,6 +104,9 @@ class LayerChunk extends Chunk {
       bo.writeByte(0);
     bo.writeUInt16(name.length);
     bo.writeString(name);
+
+    if (layerType == Tilemap)
+      bo.writeInt32(tilesetIndex);
 
     return bo.getBytes();
   }

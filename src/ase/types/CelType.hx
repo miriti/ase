@@ -4,4 +4,5 @@ package ase.types;
   var Raw = 0;
   var Linked = 1;
   var CompressedImage = 2;
+  var CompressedTilemap = 3;
 }

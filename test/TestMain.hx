@@ -219,6 +219,14 @@ class TestMain {
         return true;
       });
     });
+
+    run('Read/write tilesets/tilemaps', () -> {
+      final bytes = File.getBytes('test_files/tilemaps.aseprite');
+
+      final ase = Ase.fromBytes(bytes);
+
+      trace(ase.firstFrame.chunks);
+    });
   }
 
   static function main() {
