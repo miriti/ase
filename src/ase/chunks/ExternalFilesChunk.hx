@@ -9,7 +9,7 @@ class ExternalFilesChunk extends Chunk {
   public var entries:Array<{id:Int, fileName:String}> = [];
 
   override function getSizeWithoutHeader():Int {
-    final size = 4 // numEntries
+    var size = 4 // numEntries
       + 8; // reserved
 
     for (entry in entries) {

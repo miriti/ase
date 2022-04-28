@@ -3,6 +3,7 @@ package ase.chunks;
 import haxe.io.Bytes;
 import haxe.io.BytesInput;
 import haxe.io.BytesOutput;
+import haxe.zip.InflateImpl;
 
 class TilesetChunk extends Chunk {
   public var id:Int;
@@ -18,15 +19,17 @@ class TilesetChunk extends Chunk {
   public var compressedDataLength:Int;
   public var compressedTilesetImage:Bytes;
 
+  public var uncompressedTilesetImage:Bytes;
+
   override function getSizeWithoutHeader():Int {
-    final size = 4 // id
+    var size = 4 // id
       + 4 // flags
       + 4 // numTiles
       + 2 // width
       + 2 // height
-      + 1 // baseIndex
+      + 2 // baseIndex
       + 14 // reserved
-      + 1 // name length
+      + 2 // name length
       + name.length;
 
     if (flags == 1) {
@@ -51,18 +54,21 @@ class TilesetChunk extends Chunk {
     chunk.numTiles = bi.readInt32();
     chunk.width = bi.readUInt16();
     chunk.height = bi.readUInt16();
-    chunk.baseIndex = bi.readInt8();
+    chunk.baseIndex = bi.readUInt16();
     bi.read(14); // Ignore 14 reserved bytes
-    chunk.name = bi.readString(bi.readByte());
+    chunk.name = bi.readString(bi.readUInt16());
 
-    if (chunk.flags == 1) {
+    if (chunk.flags & (1 << 0) != 0) {
       chunk.externalFileID = bi.readInt32();
       chunk.externalTilesetID = bi.readInt32();
     }
 
-    if (chunk.flags == 2) {
+    if (chunk.flags & (1 << 2) != 0) {
       chunk.compressedDataLength = bi.readInt32();
+      chunk.compressedTilesetImage = Bytes.alloc(chunk.compressedDataLength);
       bi.readBytes(chunk.compressedTilesetImage, 0, chunk.compressedDataLength);
+
+      chunk.uncompressedTilesetImage = InflateImpl.run(new BytesInput(chunk.compressedTilesetImage));
     }
 
     return chunk;
@@ -76,10 +82,10 @@ class TilesetChunk extends Chunk {
     bo.writeInt32(numTiles);
     bo.writeUInt16(width);
     bo.writeUInt16(height);
-    bo.writeInt8(baseIndex);
+    bo.writeUInt16(baseIndex);
     for (_ in 0...14) // 14 reserved bytes set to 0
       bo.writeByte(0);
-    bo.writeByte(name.length);
+    bo.writeUInt16(name.length);
     bo.writeString(name);
 
     if (flags == 1) {
