@@ -2,6 +2,7 @@ package ase;
 
 import ase.chunks.ColorProfileChunk;
 import ase.chunks.LayerChunk;
+import ase.chunks.PaletteChunk;
 import ase.types.ChunkType;
 import ase.types.ColorDepth;
 import ase.types.Serializable;
@@ -104,11 +105,16 @@ using Lambda;
     var ase:Ase = new Ase();
 
     ase.header = AseHeader.fromBytes(bi.read(AseHeader.SIZE));
+
     for (_ in 0...ase.header.frames) {
       var frameSize:Int = bytes.getInt32(bi.position);
       var frame = Frame.fromBytes(bi.read(frameSize), ase);
       ase.frames.push(frame);
     }
+
+    final paletteChunk:PaletteChunk = cast ase.firstFrame.chunkTypes[ChunkType.PALETTE][0];
+
+    ase.palette = new Palette(paletteChunk);
 
     ase.createLayers();
 
