@@ -52,7 +52,11 @@ class Frame implements Serializable {
 
     var lastChunk:Chunk = null;
 
-    for (_ in 0...frame.header.numChunks) {
+    var numChunks:Int = frame.header.numChunks;
+    if (numChunks == 0)
+      numChunks = frame.header.oldNumChunks;
+
+    for (_ in 0...numChunks) {
       var chunkSize:Int = bytes.getInt32(bi.position);
       var chunkBytes:Bytes = bi.read(chunkSize);
       var chunk:Chunk = Chunk.fromBytes(chunkBytes);
