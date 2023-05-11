@@ -9,7 +9,7 @@ using Lambda;
 class PaletteEntry {
   public static inline var SIZE:Int = 6;
 
-  public var flags:Int;
+  public var flags:Int = 0;
   public var red:Int;
   public var green:Int;
   public var blue:Int;

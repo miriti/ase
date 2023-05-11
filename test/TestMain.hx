@@ -1,5 +1,6 @@
 package;
 
+import sys.FileSystem;
 import ase.Ase;
 import ase.AseHeader;
 import ase.types.ChunkType;
@@ -162,6 +163,7 @@ class TestMain {
     });
 
     run('Create a blank file', () -> {
+      FileSystem.createDirectory('test_files/tmp');
       var ase:Ase;
       assert('Create a new blank sprite', () -> {
         ase = Ase.create(128, 128);
@@ -181,9 +183,11 @@ class TestMain {
     });
 
     run('Create pong animation programmatically', () -> {
+      FileSystem.createDirectory('test_files/tmp');
       var ase:Ase;
 
       assert('Create a new blank sprite', () -> {
+        FileSystem.createDirectory('test_files/tmp');
         ase = Ase.create(200, 200, INDEXED,
           [0x00000000, 0x000000ff, 0xffffffff]);
 
@@ -222,10 +226,8 @@ class TestMain {
 
     run('Read/write tilesets/tilemaps', () -> {
       final bytes = File.getBytes('test_files/tilemaps.aseprite');
-
       final ase = Ase.fromBytes(bytes);
-
-      trace(ase.firstFrame.chunks);
+      // TODO: More tests
     });
   }
 
