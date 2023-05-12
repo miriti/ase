@@ -104,7 +104,7 @@ var initialPalette:Array<Int> = [
     0x847e87ff
 ];
 
-var ase = new Ase.create(spriteWidth, spriteHeight, colorDepth);
+var ase = Ase.create(spriteWidth, spriteHeight, colorDepth);
 
 ```
 
