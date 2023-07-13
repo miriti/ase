@@ -4,7 +4,7 @@ import haxe.io.Bytes;
 import haxe.io.BytesInput;
 import haxe.io.BytesOutput;
 
-@:enum abstract LayerFlags(Int) from Int to Int {
+enum abstract LayerFlags(Int) from Int to Int {
   var Visible = 1;
   var Editable = 2;
   var LockMovement = 4;
@@ -14,13 +14,13 @@ import haxe.io.BytesOutput;
   var Reference = 64;
 }
 
-@:enum abstract LayerType(Int) from Int to Int {
+enum abstract LayerType(Int) from Int to Int {
   var Normal = 0;
   var Group = 1;
   var Tilemap = 2;
 }
 
-@:enum abstract LayerBlendMode(Int) from Int to Int {
+enum abstract LayerBlendMode(Int) from Int to Int {
   var Normal = 0;
   var Multiply = 1;
   var Screen = 2;

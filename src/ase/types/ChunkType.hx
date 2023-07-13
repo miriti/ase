@@ -1,6 +1,6 @@
 package ase.types;
 
-@:enum abstract ChunkType(Int) from Int to Int {
+enum abstract ChunkType(Int) from Int to Int {
   var OLD_PALETTE_04 = 0x0004;
   var OLD_PALETTE_11 = 0x0011;
   var LAYER = 0x2004;
