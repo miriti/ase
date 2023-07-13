@@ -10,9 +10,9 @@
     "gamedev"
   ],
   "description": "Aseprite file format reader/writer",
-  "version": "2.0.2",
+  "version": "2.0.3",
   "classPath": "src",
-  "releasenote": "Bugfixes",
+  "releasenote": "`@:enum` -> `enum`",
   "contributors": [
     "miriti",
     "AustinEast"
