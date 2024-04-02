@@ -112,7 +112,8 @@ using Lambda;
       ase.frames.push(frame);
     }
 
-    final paletteChunk:PaletteChunk = cast ase.firstFrame.chunkTypes[ChunkType.PALETTE][0];
+    var untypedChunks = ase.frames[0].chunkTypes[ChunkType.PALETTE];
+    final paletteChunk:PaletteChunk = untypedChunks!=null && untypedChunks.length>0 ? (cast untypedChunks)[0] : null;
 
     ase.palette = new Palette(paletteChunk);
 
