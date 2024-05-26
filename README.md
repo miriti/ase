@@ -2,11 +2,11 @@
 
 # ASE
 
-.ase/.aseprite file format reader/writer written in Haxe with no external dependencies.
+A `.ase/.aseprite` file format reader/writer written in Haxe with no external dependencies.
 
-Implemented following the official [Aseprite File Format (.ase/.aseprite) Specifications](https://github.com/aseprite/aseprite/blob/master/docs/ase-file-specs.md)
+Implemented following the official [Aseprite File Format (.ase/.aseprite) Specifications](https://github.com/aseprite/aseprite/blob/master/docs/ase-file-specs.md).
 
-Note that this library only provides reading and writing of the Aseprite file format. If you need rendering you will have to implement it yourself or use one of the existing rendering libraries:
+Note that this library only provides reading and writing of the Aseprite file format. If you need rendering, you will have to implement it yourself or use one of the existing rendering libraries:
 
 - [OpenFL Aseprite](https://github.com/miriti/openfl-aseprite)
 - [heaps-aseprite](https://github.com/AustinEast/heaps-aseprite) by [Austin East](https://github.com/AustinEast)
@@ -20,13 +20,13 @@ Note that this library only provides reading and writing of the Aseprite file fo
 
 ### Installation
 
-```
+```shell
 haxelib install ase
 ```
 
 ### Usage
 
-#### Parsing files
+#### Parsing Files
 
 ```haxe
 import sys.io.File;
@@ -47,16 +47,13 @@ var spriteColorDepth:ColorDepth = ase.colorDepth;
 Palette:
 
 ```haxe
-for(index in ase.palette.firstIndex...ase.palette.lastIndex+1) {
-    var entry:PaletteEntry = ase.palette.getEntry(index);
+for(index => entry in ase.palette.entries) {
+    trace('Red: ${entry.red}, Green: ${entry.green}, Blue: ${entry.blue}, Alpha: ${entry.alpha}');
 
-    var r:Int = entry.r;
-    var g:Int = entry.g;
-    var b:Int = entry.b;
-    var a:Int = entry.a;
-
-    var rgbaColor = ase.palette.getRGBA(index);
-    var argbColor = ase.palette.getARGB(index);
+    // Alternatively, get the 32-bit integer RGBA or ARGB value
+    var rgbaColor:Int = ase.palette.getRGBA(index);
+    var argbColor:Int = ase.palette.getARGB(index);
+    trace('RGBA: ${StringTools.hex(rgbaColor, 8)}, ARGB: ${StringTools.hex(argbColor, 8)}');
 }
 ```
 
@@ -66,7 +63,7 @@ Layers:
 for(layer in ase.layers) {
     var layerName:String = layer.name;
     var layerEditable:Bool = layer.editable;
-    var layerVisible = layer.visible;
+    var layerVisible:Bool = layer.visible;
 }
 ```
 
@@ -88,10 +85,9 @@ var celHeight:Int = frame.cel(layerIndex).height;
 var celPixelData:Bytes = frame.cel(layerIndex).pixelData;
 ```
 
-#### Create files
+#### Creating Files
 
 ```haxe
-
 var spriteWidth:Int = 320;
 var spriteHeight:Int = 320;
 var colorDepth:ColorDepth = INDEXED;
@@ -105,16 +101,15 @@ var initialPalette:Array<Int> = [
 ];
 
 var ase = Ase.create(spriteWidth, spriteHeight, colorDepth);
-
 ```
 
-Newly created file always comes with one blank frame. To add some content add at least one layer first:
+A newly created file always comes with one blank frame. To add some content, add at least one layer first:
 
 ```haxe
 ase.addLayer('Background');
 ```
 
-Now to add some pixels to the sprite create a Cel on the first frame and the newly created layer:
+Now, to add some pixels to the sprite, create a Cel on the first frame and the newly created layer:
 
 ```haxe
 var layerIndex:Int = 0;
@@ -139,16 +134,20 @@ cel.fillIndex(0); // Fill the cel with color #0 from the palette
 cel.fillColor(0xff00ff00); // Fill the cel with ARGB color (for 32bpp mode)
 cel.setPixel(20, 20, 0xff0033aa); // Set ARGB color at x and y
 cel.setPixel(20, 20, 4); // Set color index at x and y
-cel.setPixelData(bytes, 300, 300); // Set bytes of the pixel data (the size must me equal to width x height x bpp)
+cel.setPixelData(bytes, 300, 300); // Set bytes of the pixel data (the size must be equal to width x height x bpp)
 ```
 
-At any time you can get the file representation as bytes and, for example, store them to a file:
+At any time, you can get the file representation as bytes and, for example, store them to a file:
 
 ```haxe
 var bytes = ase.getBytes();
 File.saveBytes('my_aseprite_file.aseprite', bytes);
 ```
 
+## Contributors
+
+See [https://github.com/miriti/ase/graphs/contributors](https://github.com/miriti/ase/graphs/contributors).
+
 ## License
 
-This project is licensed under the MIT License - see the LICENSE.md file for details
+This project is licensed under the MIT License - see the [LICENSE.md](./LICENSE.md) file for details.

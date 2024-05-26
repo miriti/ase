@@ -10,12 +10,11 @@
     "gamedev"
   ],
   "description": "Aseprite file format reader/writer",
-  "version": "2.0.4",
+  "version": "2.1.0",
   "classPath": "src",
-  "releasenote": "Compatibility with the latest Aseprite format",
+  "releasenote": "Adjustments for the way Aseprite 1.3.5 handles palettes",
   "contributors": [
-    "miriti",
-    "AustinEast"
+    "miriti"
   ],
   "dependencies": {}
 }

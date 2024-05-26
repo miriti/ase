@@ -1,11 +1,12 @@
 package ase.chunks;
 
-import ase.types.Serializable;
 import ase.types.ChunkType;
+import ase.types.Serializable;
 import haxe.io.Bytes;
 import haxe.io.BytesInput;
 import haxe.io.BytesOutput;
 
+using StringTools;
 using Type;
 
 class Chunk implements Serializable {
@@ -19,7 +20,7 @@ class Chunk implements Serializable {
   }
 
   function getSizeWithoutHeader():Int {
-    throw '${Type.getClassName(Type.getClass(this))}.getSizeWithoutHeader() is not implemented';
+    throw '${this.getClass().getClassName()}.getSizeWithoutHeader() is not implemented';
   }
 
   public static function fromBytes(bytes:Bytes):Chunk {
@@ -71,6 +72,11 @@ class Chunk implements Serializable {
 
   public function toBytes(?out:BytesOutput):Bytes {
     throw '${this.getClass().getClassName().split('.').pop()}.toBytes() is not implemented';
+  }
+
+  public function toString():String {
+    return
+      '0x${this.header.type.hex(4)}: ${this.getClass().getClassName().split('.').pop()}';
   }
 
   private function new(?createHeader:Bool = false, ?type:ChunkType) {

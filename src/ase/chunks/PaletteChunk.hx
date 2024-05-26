@@ -1,12 +1,13 @@
 package ase.chunks;
 
+import ase.Palette.PaletteEntry;
 import haxe.io.Bytes;
 import haxe.io.BytesInput;
 import haxe.io.BytesOutput;
 
 using Lambda;
 
-class PaletteEntry {
+class PaletteChunkEntry {
   public static inline var SIZE:Int = 6;
 
   public var flags:Int = 0;
@@ -27,8 +28,8 @@ class PaletteEntry {
     return val;
   }
 
-  public static function fromBytes(bytes:Bytes):PaletteEntry {
-    var entry = new PaletteEntry();
+  public static function fromBytes(bytes:Bytes):PaletteChunkEntry {
+    var entry = new PaletteChunkEntry();
     var bi:BytesInput = new BytesInput(bytes);
 
     entry.flags = bi.readUInt16();
@@ -63,7 +64,7 @@ class PaletteEntry {
   }
 
   public function toString() {
-    return 'R: $red G: $green B: $blue A: $alpha';
+    return '(R: $red G: $green B: $blue A: $alpha)';
   }
 
   public function new(?name:String, ?color:Int) {
@@ -85,17 +86,17 @@ class PaletteChunk extends Chunk {
   public var paletteSize:Int = 0;
   public var firstColorIndex:Int = 0;
   public var lastColorIndex:Int = -1;
-  public var entries:Map<Int, PaletteEntry> = [];
+  public var entries:Map<Int, PaletteChunkEntry> = [];
 
   override function getSizeWithoutHeader():Int {
     return 4 // palette size
       + 4 // firstColorIndex
       + 4 // lastColorIndex
       + 8 // reserved
-      + PaletteEntry.SIZE * (lastColorIndex - firstColorIndex + 1);
+      + PaletteChunkEntry.SIZE * (lastColorIndex - firstColorIndex + 1);
   }
 
-  public function addEntry(entry:PaletteEntry) {
+  public function addEntry(entry:PaletteChunkEntry) {
     lastColorIndex++;
     entries[lastColorIndex] = entry;
     paletteSize++;
@@ -113,9 +114,9 @@ class PaletteChunk extends Chunk {
     var entryStart:Int = bi.position;
 
     for (entryNum in chunk.firstColorIndex...chunk.lastColorIndex + 1) {
-      var entry = PaletteEntry.fromBytes(bi.read(PaletteEntry.SIZE));
+      var entry = PaletteChunkEntry.fromBytes(bi.read(PaletteChunkEntry.SIZE));
       chunk.entries[entryNum] = entry;
-      entryStart += PaletteEntry.SIZE;
+      entryStart += PaletteChunkEntry.SIZE;
     }
 
     return chunk;
@@ -129,6 +130,7 @@ class PaletteChunk extends Chunk {
     bo.writeInt32(paletteSize);
     bo.writeInt32(firstColorIndex);
     bo.writeInt32(lastColorIndex);
+
     for (_ in 0...8)
       bo.writeByte(0);
 
@@ -137,6 +139,25 @@ class PaletteChunk extends Chunk {
     }
 
     return bo.getBytes();
+  }
+
+  public static function fromPaletteEntries(entries:Array<PaletteEntry>) {
+    final chunk = new PaletteChunk(true);
+
+    for (entry in entries) {
+      final chunkEntry = new PaletteChunkEntry();
+      chunkEntry.red = entry.red;
+      chunkEntry.green = entry.green;
+      chunkEntry.blue = entry.blue;
+      chunkEntry.alpha = entry.alpha;
+      chunk.addEntry(chunkEntry);
+    }
+
+    return chunk;
+  }
+
+  override function toString():String {
+    return [super.toString(), 'paletteSize: $paletteSize'].join('\n');
   }
 
   public function new(?createHeader:Bool = false) {

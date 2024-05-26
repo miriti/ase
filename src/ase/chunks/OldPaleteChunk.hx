@@ -1,5 +1,6 @@
 package ase.chunks;
 
+import ase.Palette.PaletteEntry;
 import haxe.io.Bytes;
 import haxe.io.BytesInput;
 import haxe.io.BytesOutput;
@@ -18,11 +19,11 @@ class OldPaleteChunk extends Chunk {
 
   override function getSizeWithoutHeader():Int {
     return 2 // numPackets
-      + packets.map(packet -> {
-        return 1 // skipEntries
-          + 1 // numColors
-          + (packet.colors.length * 3);
-      }).fold((packetSize:Int, result:Int) -> packetSize + result, 0);
+      + packets.map(packet -> 1 // skipEntries
+        + 1 // numColors
+        + (packet.colors.length * 3)).fold((packetSize:Int,
+          result:Int) -> packetSize
+          + result, 0);
   }
 
   public static function fromBytes(bytes:Bytes):OldPaleteChunk {
@@ -71,6 +72,30 @@ class OldPaleteChunk extends Chunk {
     }
 
     return bo.getBytes();
+  }
+
+  public static function fromPaletteEntries(entries:Array<PaletteEntry>) {
+    final chunk = new OldPaleteChunk(true);
+    chunk.numPackets = 1;
+    chunk.packets = [
+      {
+        skipEntries: 0,
+        // Save at most 256 colors
+        numColors: Std.int(Math.min(entries.length, 256)),
+        colors: entries.slice(0, 256).map(e -> ({
+          red: e.red,
+          green: e.green,
+          blue: e.blue
+        }))
+      }
+    ];
+    return chunk;
+  }
+
+  override function toString():String {
+    return super.toString()
+      +
+      ' { numPackets: ${numPackets}, packets: [${packets.map(p -> '{ skipEntries: ${p.skipEntries}, numColors: ${p.numColors} }').join(', ')}] }';
   }
 
   private function new(?createHeader:Bool = false) {

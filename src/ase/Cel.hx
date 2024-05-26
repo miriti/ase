@@ -137,7 +137,7 @@ class Cel {
     @param color ARGB color for 32bpp mode, GGGG color for 16bpp mode and index or GG color for Indexed or 8bpp mode
    */
   public function setPixel(px:Int, py:Int, color:Int) {
-    if (px > 0 && px < width && py > 0 && py < height) {
+    if (px >= 0 && px < width && py >= 0 && py < height) {
       var p = (width * py + px) * (frame.ase.colorDepth / 8).int();
       switch (frame.ase.colorDepth) {
         case BPP32:

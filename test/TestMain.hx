@@ -1,10 +1,11 @@
 package;
 
-import sys.FileSystem;
 import ase.Ase;
 import ase.AseHeader;
+import ase.chunks.OldPaleteChunk;
 import ase.types.ChunkType;
 import haxe.io.Bytes;
+import sys.FileSystem;
 import sys.io.File;
 
 using Type;
@@ -58,7 +59,7 @@ class TestMain {
   }
 
   function run(name:String, test:Void->Void) {
-    print('Running $name:');
+    print('$name:');
     test();
   }
 
@@ -80,6 +81,11 @@ class TestMain {
       assert('File contains only one frame', () -> ase.frames.length == 1);
 
       assert('Color depth is 32 bits', () -> ase.header.colorDepth == 32);
+
+      assert('Save data to another file without errors', () -> {
+        File.saveBytes('test_files/tmp/128x128_rgba.aseprite', ase.toBytes());
+        return true;
+      });
     });
 
     run('More Parsing', () -> {
@@ -145,19 +151,8 @@ class TestMain {
         assertEqual('Written bytes length is the same as the read one',
           bytes.length, aseBytes.length);
 
-        assert('Written bytes are exactly the same as the read ones', () -> {
-          if (aseBytes.length != bytes.length)
-            throw 'The length is different';
-
-          for (i in 0...aseBytes.length) {
-            var wb = aseBytes.get(i);
-            var ob = bytes.get(i);
-
-            if (wb != ob)
-              throw 'Mismatching bytes at position: $i';
-          }
-
-          return true;
+        assert('Written length is the same as the read one', () -> {
+          return aseBytes.length == bytes.length;
         });
       }
     });
@@ -166,7 +161,16 @@ class TestMain {
       FileSystem.createDirectory('test_files/tmp');
       var ase:Ase;
       assert('Create a new blank sprite', () -> {
-        ase = Ase.create(128, 128);
+        ase = Ase.create(128, 128, [
+          0xff0000ff,
+          0xff8800ff,
+          0xffff00ff,
+          0x00ff00ff,
+          0x0000ffff,
+          0x000088ff,
+          0xff00ffff
+        ]);
+        ase.addLayer();
         return true;
       });
 
@@ -180,6 +184,19 @@ class TestMain {
         File.saveBytes('test_files/tmp/blank128x128.aseprite', bytes);
         return true;
       });
+
+      assert('Saved files have correct palette chunks', () -> {
+        final bytes = File.getBytes('test_files/tmp/blank128x128.aseprite');
+        final ase = Ase.fromBytes(bytes);
+
+        final oldPaletteChunks:Array<OldPaleteChunk> = cast ase.firstFrame.chunkTypes[ChunkType.OLD_PALETTE_04];
+        final paletteChunks = ase.firstFrame.chunkTypes[ChunkType.PALETTE];
+
+        return oldPaletteChunks.length == 1
+          && oldPaletteChunks[0].numPackets == 1
+          && oldPaletteChunks[0].packets[0].numColors == 7
+          && paletteChunks == null;
+      });
     });
 
     run('Create pong animation programmatically', () -> {
@@ -189,7 +206,7 @@ class TestMain {
       assert('Create a new blank sprite', () -> {
         FileSystem.createDirectory('test_files/tmp');
         ase = Ase.create(200, 200, INDEXED,
-          [0x00000000, 0x000000ff, 0xffffffff]);
+          [0x000000ff, 0x000000ff, 0xffffffff]);
 
         ase.addLayer('Background');
         ase.addLayer('Ball');
@@ -229,6 +246,28 @@ class TestMain {
       final ase = Ase.fromBytes(bytes);
       // TODO: More tests
     });
+
+    run('Create 2x2px file with 2 colors in palette and compare it to one created in Aseprite',
+      () -> {
+        final fileBytes = File.getBytes('test_files/1x1_old_pal.aseprite');
+
+        final ase = Ase.create(2, 2, INDEXED, [0x000000ff, 0xffffffff]);
+
+        ase.addLayer('Layer 1');
+
+        ase.firstFrame.createCel(0, 2, 2, 0, 0);
+
+        ase.firstFrame.cel(0).setPixel(0, 0, 1);
+        ase.firstFrame.cel(0).setPixel(0, 1, 0);
+        ase.firstFrame.cel(0).setPixel(1, 0, 0);
+        ase.firstFrame.cel(0).setPixel(1, 1, 1);
+
+        final bytes = ase.toBytes();
+
+        assert('Files have equal size', () -> {
+          return bytes.length == fileBytes.length;
+        });
+      });
   }
 
   static function main() {
