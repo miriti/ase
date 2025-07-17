@@ -1,0 +1,30 @@
+name: Test and Publish
+
+on:
+  push:
+    tags:
+      - '*'
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    container:
+      image: haxe/haxe:latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Run tests
+        run: haxe test.hxml
+
+  release:
+    needs: test
+    runs-on: ubuntu-latest
+    container:
+      image: haxe/haxe:latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Create zip archive
+        run: zip -r ase.zip src haxelib.json *.md
+      - name: Publish to haxelib
+        env:
+          HAXELIB_PASSWORD: ${{ secrets.HAXELIB_PASSWORD }}
+        run: echo "$HAXELIB_PASSWORD" | haxelib submit ase.zip
