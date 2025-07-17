@@ -85,14 +85,20 @@ class Palette {
     Create palette from Palette Chunk (0x2019)
   **/
   public static function fromChunk(chunk:PaletteChunk) {
-    return new Palette(chunk.entries.map((item) -> {
-      return {
+    final entries_array:Array<PaletteEntry> = new Array();
+
+    entries_array.resize(chunk.firstColorIndex + 1);
+
+    for (index => item in chunk.entries) {
+      entries_array[index] = {
         red: item.red,
         green: item.green,
         blue: item.blue,
         alpha: item.alpha
-      }
-    }));
+      };
+    }
+
+    return new Palette(entries_array);
   }
 
   /**
